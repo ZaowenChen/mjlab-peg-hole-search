@@ -1,0 +1,13 @@
+<mujoco>
+    <asset>
+        <mesh name="link1"
+              file="link4_bin.STL"/>
+    </asset>
+
+    <worldbody>
+        <body>
+            <geom type="mesh"
+                  mesh="link1"/>
+        </body>
+    </worldbody>
+</mujoco>

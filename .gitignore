@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+
+# Generated experiment data and local reports are preserved on disk but are
+# not suitable for ordinary Git.  The two small index files remain tracked.
+evaluation/*
+!evaluation/README.md
+!evaluation/EXPERIMENT_INDEX.md
+figures/
+
+# Frozen source snapshots and local runtime artefacts are provenance inputs,
+# not source files.  Their manifests and checksums stay tracked.
+reference/*.tar.gz
+*.log
+MUJOCO_LOG.TXT

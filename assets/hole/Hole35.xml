@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="AssembledModel">
+  <compiler meshdir="."/>
+  <!-- In the source scene these defaults are inherited from robot.xml.
+       MJLab loads the hole independently, so they must be explicit here. -->
+  <default>
+    <geom condim="4" contype="1" conaffinity="15"
+          friction="0.9 0.2 0.2" solref="0.001 2"/>
+  </default>
+  <asset>
+    <mesh name="Assem1 - Part1-1" file="Assem1 - Part1-1.obj"/>
+    <mesh name="Assem1 - Part1-10" file="Assem1 - Part1-10.obj"/>
+    <mesh name="Assem1 - Part1-11" file="Assem1 - Part1-11.obj"/>
+    <mesh name="Assem1 - Part1-12" file="Assem1 - Part1-12.obj"/>
+    <mesh name="Assem1 - Part1-13" file="Assem1 - Part1-13.obj"/>
+    <mesh name="Assem1 - Part1-14" file="Assem1 - Part1-14.obj"/>
+    <mesh name="Assem1 - Part1-15" file="Assem1 - Part1-15.obj"/>
+    <mesh name="Assem1 - Part1-16" file="Assem1 - Part1-16.obj"/>
+    <mesh name="Assem1 - Part1-17" file="Assem1 - Part1-17.obj"/>
+    <mesh name="Assem1 - Part1-18" file="Assem1 - Part1-18.obj"/>
+    <mesh name="Assem1 - Part1-19" file="Assem1 - Part1-19.obj"/>
+    <mesh name="Assem1 - Part1-20" file="Assem1 - Part1-20.obj"/>
+    <mesh name="Assem1 - Part1-21" file="Assem1 - Part1-21.obj"/>
+    <mesh name="Assem1 - Part1-22" file="Assem1 - Part1-22.obj"/>
+    <mesh name="Assem1 - Part1-23" file="Assem1 - Part1-23.obj"/>
+    <mesh name="Assem1 - Part1-24" file="Assem1 - Part1-24.obj"/>
+    <mesh name="Assem1 - Part1-25" file="Assem1 - Part1-25.obj"/>
+    <mesh name="Assem1 - Part1-26" file="Assem1 - Part1-26.obj"/>
+    <mesh name="Assem1 - Part1-27" file="Assem1 - Part1-27.obj"/>
+    <mesh name="Assem1 - Part1-28" file="Assem1 - Part1-28.obj"/>
+    <mesh name="Assem1 - Part1-29" file="Assem1 - Part1-29.obj"/>
+    <mesh name="Assem1 - Part1-30" file="Assem1 - Part1-30.obj"/>
+    <mesh name="Assem1 - Part1-31" file="Assem1 - Part1-31.obj"/>
+    <mesh name="Assem1 - Part1-32" file="Assem1 - Part1-32.obj"/>
+    <mesh name="Assem1 - Part1-33" file="Assem1 - Part1-33.obj"/>
+    <mesh name="Assem1 - Part1-34" file="Assem1 - Part1-34.obj"/>
+    <mesh name="Assem1 - Part1-35" file="Assem1 - Part1-35.obj"/>
+    <mesh name="Assem1 - Part1-36" file="Assem1 - Part1-36.obj"/>
+    <mesh name="Assem1 - Part1-37" file="Assem1 - Part1-37.obj"/>
+    <mesh name="Assem1 - Part1-38" file="Assem1 - Part1-38.obj"/>
+    <mesh name="Assem1 - Part1-39" file="Assem1 - Part1-39.obj"/>
+    <mesh name="Assem1 - Part1-40" file="Assem1 - Part1-40.obj"/>
+    <mesh name="Assem1 - Part1-41" file="Assem1 - Part1-41.obj"/>
+    <mesh name="Assem1 - Part1-42" file="Assem1 - Part1-42.obj"/>
+    <mesh name="Assem1 - Part1-43" file="Assem1 - Part1-43.obj"/>
+    <mesh name="Assem1 - Part1-44" file="Assem1 - Part1-44.obj"/>
+    <mesh name="Assem1 - Part1-45" file="Assem1 - Part1-45.obj"/>
+    <mesh name="Assem1 - Part1-46" file="Assem1 - Part1-46.obj"/>
+    <mesh name="Assem1 - Part1-47" file="Assem1 - Part1-47.obj"/>
+    <mesh name="Assem1 - Part1-48" file="Assem1 - Part1-48.obj"/>
+    <mesh name="Assem1 - Part1-49" file="Assem1 - Part1-49.obj"/>
+    <mesh name="Assem1 - Part1-50" file="Assem1 - Part1-50.obj"/>
+    <mesh name="Assem1 - Part1-51" file="Assem1 - Part1-51.obj"/>
+    <mesh name="Assem1 - Part1-52" file="Assem1 - Part1-52.obj"/>
+    <mesh name="Assem1 - Part1-53" file="Assem1 - Part1-53.obj"/>
+    <mesh name="Assem1 - Part1-54" file="Assem1 - Part1-54.obj"/>
+    <mesh name="Assem1 - Part1-55" file="Assem1 - Part1-55.obj"/>
+    <mesh name="Assem1 - Part1-56" file="Assem1 - Part1-56.obj"/>
+    <mesh name="Assem1 - Part1-57" file="Assem1 - Part1-57.obj"/>
+    <mesh name="Assem1 - Part1-58" file="Assem1 - Part1-58.obj"/>
+    <mesh name="Assem1 - Part1-59" file="Assem1 - Part1-59.obj"/>
+    <mesh name="Assem1 - Part1-60" file="Assem1 - Part1-60.obj"/>
+    <mesh name="Assem1 - Part1-61" file="Assem1 - Part1-61.obj"/>
+    <mesh name="Assem1 - Part1-62" file="Assem1 - Part1-62.obj"/>
+    <mesh name="Assem1 - Part1-63" file="Assem1 - Part1-63.obj"/>
+    <mesh name="Assem1 - Part1-64" file="Assem1 - Part1-64.obj"/>
+    <mesh name="Assem1 - Part1-65" file="Assem1 - Part1-65.obj"/>
+    <mesh name="Assem1 - Part1-66" file="Assem1 - Part1-66.obj"/>
+    <mesh name="Assem1 - Part1-67" file="Assem1 - Part1-67.obj"/>
+    <mesh name="Assem1 - Part1-68" file="Assem1 - Part1-68.obj"/>
+    <mesh name="Assem1 - Part1-69" file="Assem1 - Part1-69.obj"/>
+    <mesh name="Assem1 - Part1-70" file="Assem1 - Part1-70.obj"/>
+    <mesh name="Assem1 - Part1-71" file="Assem1 - Part1-71.obj"/>
+    <mesh name="Assem1 - Part1-72" file="Assem1 - Part1-72.obj"/>
+    <mesh name="Assem1 - Part1-73" file="Assem1 - Part1-73.obj"/>
+    <mesh name="Assem1 - Part1-74" file="Assem1 - Part1-74.obj"/>
+    <mesh name="Assem1 - Part1-75" file="Assem1 - Part1-75.obj"/>
+    <mesh name="Assem1 - Part1-76" file="Assem1 - Part1-76.obj"/>
+    <mesh name="Assem1 - Part1-77" file="Assem1 - Part1-77.obj"/>
+    <mesh name="Assem1 - Part1-78" file="Assem1 - Part1-78.obj"/>
+    <mesh name="Assem1 - Part1-79" file="Assem1 - Part1-79.obj"/>
+    <mesh name="Assem1 - Part1-9" file="Assem1 - Part1-9.obj"/>
+    <mesh name="Assem1 - Part2-1" file="Assem1 - Part2-1.obj"/>
+    <mesh name="Assem1 - Part2-3" file="Assem1 - Part2-3.obj"/>
+    <mesh name="Assem1 - Part2-4" file="Assem1 - Part2-4.obj"/>
+    <mesh name="Assem1 - Part2-5" file="Assem1 - Part2-5.obj"/>
+  </asset>
+  <worldbody>
+    <body name="root_hole" pos="0.85 0 0.1" >
+    <body name="Assem1 - Part1-1" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-1" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-1" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-10" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-10" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-10" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-11" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-11" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-11" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-12" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-12" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-12" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-13" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-13" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-13" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-14" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-14" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-14" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-15" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-15" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-15" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-16" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-16" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-16" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-17" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-17" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-17" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-18" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-18" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-18" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-19" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-19" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-19" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-20" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-20" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-20" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-21" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-21" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-21" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-22" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-22" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-22" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-23" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-23" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-23" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-24" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-24" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-24" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-25" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-25" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-25" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-26" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-26" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-26" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-27" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-27" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-27" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-28" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-28" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-28" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-29" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-29" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-29" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-30" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-30" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-30" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-31" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-31" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-31" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-32" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-32" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-32" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-33" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-33" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-33" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-34" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-34" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-34" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-35" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-35" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-35" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-36" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-36" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-36" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-37" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-37" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-37" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-38" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-38" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-38" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-39" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-39" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-39" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-40" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-40" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-40" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-41" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-41" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-41" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-42" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-42" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-42" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-43" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-43" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-43" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-44" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-44" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-44" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-45" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-45" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-45" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-46" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-46" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-46" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-47" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-47" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-47" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-48" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-48" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-48" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-49" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-49" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-49" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-50" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-50" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-50" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-51" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-51" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-51" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-52" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-52" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-52" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-53" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-53" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-53" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-54" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-54" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-54" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-55" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-55" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-55" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-56" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-56" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-56" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-57" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-57" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-57" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-58" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-58" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-58" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-59" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-59" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-59" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-60" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-60" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-60" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-61" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-61" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-61" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-62" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-62" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-62" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-63" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-63" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-63" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-64" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-64" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-64" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-65" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-65" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-65" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-66" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-66" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-66" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-67" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-67" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-67" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-68" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-68" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-68" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-69" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-69" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-69" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-70" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-70" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-70" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-71" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-71" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-71" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-72" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-72" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-72" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-73" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-73" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-73" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-74" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-74" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-74" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-75" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-75" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-75" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-76" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-76" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-76" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-77" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-77" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-77" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-78" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-78" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-78" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-79" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-79" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-79" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part1-9" pos="0 0 0">
+      <geom mesh="Assem1 - Part1-9" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part1-9" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part2-1" pos="0 0 0">
+      <geom mesh="Assem1 - Part2-1" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part2-1" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part2-3" pos="0 0 0">
+      <geom mesh="Assem1 - Part2-3" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part2-3" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part2-4" pos="0 0 0">
+      <geom mesh="Assem1 - Part2-4" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part2-4" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    <body name="Assem1 - Part2-5" pos="0 0 0">
+      <geom mesh="Assem1 - Part2-5" type="mesh" rgba="0.678431 0.847059 0.901961 1" contype="0" conaffinity="0" group="2"/>
+      <geom mesh="Assem1 - Part2-5" type="mesh" rgba="0 0 0 0" contype="1" conaffinity="1" group="3"/>
+    </body>
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,0 +1,253 @@
+ M .gitignore
+ D AGILE_DEVELOPMENT_GUIDE_20MM_15DEG.md
+ M README.md
+ M "assets/hole/Assem1 - Part1-1.obj"
+ M "assets/hole/Assem1 - Part1-10.obj"
+ M "assets/hole/Assem1 - Part1-11.obj"
+ M "assets/hole/Assem1 - Part1-12.obj"
+ M "assets/hole/Assem1 - Part1-13.obj"
+ M "assets/hole/Assem1 - Part1-14.obj"
+ M "assets/hole/Assem1 - Part1-15.obj"
+ M "assets/hole/Assem1 - Part1-16.obj"
+ M "assets/hole/Assem1 - Part1-17.obj"
+ M "assets/hole/Assem1 - Part1-18.obj"
+ M "assets/hole/Assem1 - Part1-19.obj"
+ M "assets/hole/Assem1 - Part1-20.obj"
+ M "assets/hole/Assem1 - Part1-21.obj"
+ M "assets/hole/Assem1 - Part1-22.obj"
+ M "assets/hole/Assem1 - Part1-23.obj"
+ M "assets/hole/Assem1 - Part1-24.obj"
+ M "assets/hole/Assem1 - Part1-25.obj"
+ M "assets/hole/Assem1 - Part1-26.obj"
+ M "assets/hole/Assem1 - Part1-27.obj"
+ M "assets/hole/Assem1 - Part1-28.obj"
+ M "assets/hole/Assem1 - Part1-29.obj"
+ M "assets/hole/Assem1 - Part1-30.obj"
+ M "assets/hole/Assem1 - Part1-31.obj"
+ M "assets/hole/Assem1 - Part1-32.obj"
+ M "assets/hole/Assem1 - Part1-33.obj"
+ M "assets/hole/Assem1 - Part1-34.obj"
+ M "assets/hole/Assem1 - Part1-35.obj"
+ M "assets/hole/Assem1 - Part1-36.obj"
+ M "assets/hole/Assem1 - Part1-37.obj"
+ M "assets/hole/Assem1 - Part1-38.obj"
+ M "assets/hole/Assem1 - Part1-39.obj"
+ M "assets/hole/Assem1 - Part1-40.obj"
+ M "assets/hole/Assem1 - Part1-41.obj"
+ M "assets/hole/Assem1 - Part1-42.obj"
+ M "assets/hole/Assem1 - Part1-43.obj"
+ M "assets/hole/Assem1 - Part1-44.obj"
+ M "assets/hole/Assem1 - Part1-45.obj"
+ M "assets/hole/Assem1 - Part1-46.obj"
+ M "assets/hole/Assem1 - Part1-47.obj"
+ M "assets/hole/Assem1 - Part1-48.obj"
+ M "assets/hole/Assem1 - Part1-49.obj"
+ M "assets/hole/Assem1 - Part1-50.obj"
+ M "assets/hole/Assem1 - Part1-51.obj"
+ M "assets/hole/Assem1 - Part1-52.obj"
+ M "assets/hole/Assem1 - Part1-53.obj"
+ M "assets/hole/Assem1 - Part1-54.obj"
+ M "assets/hole/Assem1 - Part1-55.obj"
+ M "assets/hole/Assem1 - Part1-56.obj"
+ M "assets/hole/Assem1 - Part1-57.obj"
+ M "assets/hole/Assem1 - Part1-58.obj"
+ M "assets/hole/Assem1 - Part1-59.obj"
+ M "assets/hole/Assem1 - Part1-60.obj"
+ M "assets/hole/Assem1 - Part1-61.obj"
+ M "assets/hole/Assem1 - Part1-62.obj"
+ M "assets/hole/Assem1 - Part1-63.obj"
+ M "assets/hole/Assem1 - Part1-64.obj"
+ M "assets/hole/Assem1 - Part1-65.obj"
+ M "assets/hole/Assem1 - Part1-66.obj"
+ M "assets/hole/Assem1 - Part1-67.obj"
+ M "assets/hole/Assem1 - Part1-68.obj"
+ M "assets/hole/Assem1 - Part1-69.obj"
+ M "assets/hole/Assem1 - Part1-70.obj"
+ M "assets/hole/Assem1 - Part1-71.obj"
+ M "assets/hole/Assem1 - Part1-72.obj"
+ M "assets/hole/Assem1 - Part1-73.obj"
+ M "assets/hole/Assem1 - Part1-74.obj"
+ M "assets/hole/Assem1 - Part1-75.obj"
+ M "assets/hole/Assem1 - Part1-76.obj"
+ M "assets/hole/Assem1 - Part1-77.obj"
+ M "assets/hole/Assem1 - Part1-78.obj"
+ M "assets/hole/Assem1 - Part1-79.obj"
+ M "assets/hole/Assem1 - Part1-9.obj"
+ M "assets/hole/Assem1 - Part2-1.obj"
+ M "assets/hole/Assem1 - Part2-3.obj"
+ M "assets/hole/Assem1 - Part2-4.obj"
+ M "assets/hole/Assem1 - Part2-5.obj"
+ M assets/hole/Hole35.xml
+ M assets/peg/Peg34.9.xml
+ M assets/peg/pa1.obj
+ M assets/peg/pa2.obj
+ M assets/robot/hand.xml
+ M assets/robot/hand_assets/base_link.stl
+ M assets/robot/hand_assets/end_tool.stl
+ M assets/robot/hand_assets/left_finger.stl
+ M assets/robot/hand_assets/left_inner_knuckle.stl
+ M assets/robot/hand_assets/left_outer_knuckle.stl
+ M assets/robot/hand_assets/right_finger.stl
+ M assets/robot/hand_assets/right_inner_knuckle.stl
+ M assets/robot/hand_assets/right_outer_knuckle.stl
+ M assets/robot/iER15-1430-MI/collision/base_link.STL
+ M assets/robot/iER15-1430-MI/collision/link1.STL
+ M assets/robot/iER15-1430-MI/collision/link2.STL
+ M assets/robot/iER15-1430-MI/collision/link3.STL
+ M assets/robot/iER15-1430-MI/collision/link4.STL
+ M assets/robot/iER15-1430-MI/collision/link5.STL
+ M assets/robot/iER15-1430-MI/collision/link6.STL
+ M assets/robot/iER15-1430-MI/visual/link1.STL
+ M assets/robot/iER15-1430-MI/visual/link2.STL
+ M assets/robot/iER15-1430-MI/visual/link3.STL
+ M assets/robot/iER15-1430-MI/visual/link4.STL
+ M assets/robot/iER15-1430-MI/visual/link5.STL
+ M assets/robot/iER15-1430-MI/visual/link6.STL
+ M assets/robot/iER15-1430-MI/visual/test.xml
+ M assets/robot/robot.xml
+ M assets/scene.xml
+ M docs/120组零训练测试.md
+ M docs/reference-source-sha256.json
+ M docs/参数对齐分析.md
+ M docs/零训练5mm5度测试.md
+ D logs/attitude_grid_120_20260909/artifact_hashes.json
+ D logs/attitude_grid_120_20260909/batch_000/results.json
+ D logs/attitude_grid_120_20260909/batch_000/trajectories.npz
+ D logs/attitude_grid_120_20260909/batch_032/results.json
+ D logs/attitude_grid_120_20260909/batch_032/trajectories.npz
+ D logs/attitude_grid_120_20260909/batch_064/results.json
+ D logs/attitude_grid_120_20260909/batch_064/trajectories.npz
+ D logs/attitude_grid_120_20260909/batch_096/results.json
+ D logs/attitude_grid_120_20260909/batch_096/trajectories.npz
+ D logs/attitude_grid_120_20260909/cases.json
+ D logs/attitude_grid_120_20260909/coverage.png
+ D logs/attitude_grid_120_20260909/failures.json
+ D logs/attitude_grid_120_20260909/grid.log
+ D logs/attitude_grid_120_20260909/metadata.json
+ D logs/attitude_grid_120_20260909/parallel_agreement.json
+ D logs/attitude_grid_120_20260909/parallel_check.log
+ D logs/attitude_grid_120_20260909/parallel_check/results.json
+ D logs/attitude_grid_120_20260909/parallel_check/trajectories.npz
+ D logs/attitude_grid_120_20260909/replay_failures.sh
+ D logs/attitude_grid_120_20260909/results.csv
+ D logs/attitude_grid_120_20260909/results.json
+ D logs/attitude_grid_120_20260909/single.log
+ D logs/attitude_grid_120_20260909/single/results.json
+ D logs/attitude_grid_120_20260909/single/trajectories.npz
+ D logs/attitude_grid_120_20260909/summary.json
+ D logs/attitude_grid_120_20260909/trajectories.png
+ D logs/attitude_grid_120_20260909/测试报告.md
+ M pyproject.toml
+ D scripts/analyze_contact_mode_observables.py
+ D scripts/analyze_dynamic_alignment_stop.py
+ D scripts/analyze_offset_moment_affine.py
+ D scripts/audit_geometry.py
+ D scripts/benchmark_vectorized_env.py
+ D scripts/calibrate_attitude_probe_execution.py
+ D scripts/calibrate_initial_pose.py
+ D scripts/check_attitude_parallel.py
+ D scripts/diagnose_baseline.py
+ D scripts/diagnose_xy_contact_modes.py
+ D scripts/evaluate_search.py
+ M scripts/play.py
+ D scripts/report_attitude_grid.py
+ M scripts/run_gpu.sh
+ D scripts/run_isolation_experiments.py
+ D scripts/smoke_ik_action.py
+ D scripts/smoke_reset.py
+ D scripts/smoke_scene.py
+ D scripts/test_zero_attitude.py
+ M scripts/train.py
+ D scripts/validate_attitude_batch.py
+ D scripts/validate_attitude_grid.py
+ D scripts/validate_attitude_symmetric_probe.py
+ D scripts/validate_attitude_transfer.py
+ D scripts/validate_contact_sign.py
+ D scripts/validate_continuous_xy_entry.py
+ D scripts/validate_dynamic_attitude_alignment.py
+ D scripts/validate_dynamic_attitude_search.py
+ D scripts/validate_project.py
+ D scripts/validate_safe_initialization.py
+ D scripts/validate_wobble_demodulation.py
+ D scripts/validate_xy_moment_direction.py
+ M src/mjlab_peg_hole_search/__init__.py
+ M src/mjlab_peg_hole_search/assets.py
+ M src/mjlab_peg_hole_search/config.py
+ M src/mjlab_peg_hole_search/control.py
+ M src/mjlab_peg_hole_search/control_torch.py
+ M src/mjlab_peg_hole_search/randomization.py
+ M src/mjlab_peg_hole_search/reference_control.py
+ M src/mjlab_peg_hole_search/tasks/__init__.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/__init__.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/env_cfg.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/__init__.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/actions.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/curriculums.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/events.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/observations.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/rewards.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/mdp/terminations.py
+ M src/mjlab_peg_hole_search/tasks/peg_hole/rl_cfg.py
+ M src/mjlab_peg_hole_search/wrench.py
+ M src/mjlab_peg_hole_search/wrench_torch.py
+ D tests/test_attitude_grid_metrics.py
+ D tests/test_control.py
+ D tests/test_control_torch.py
+ D tests/test_curriculum.py
+ D tests/test_insertion_fit.py
+ D tests/test_p2_observations.py
+ D tests/test_p2_terminations.py
+ D tests/test_randomization.py
+ D tests/test_reference_assets.py
+ D tests/test_reference_control.py
+ D tests/test_wrench_torch.py
+?? CURRENT_STATE.md
+?? MUJOCO_LOG.TXT
+?? docs/RQ003固定控制验证.md
+?? docs/SPIKE001严格接触验收.md
+?? docs/XY制动标志跨阶段修复.md
+?? docs/remaining-work-delivery.md
+?? docs/低力候选与短驻留实验.md
+?? docs/候选窗口出口分离验证.md
+?? docs/大偏差摸孔诊断.md
+?? docs/并行锥形摸孔实验.md
+?? docs/浅入孔与受限XY验证.md
+?? docs/训练初始化2mm验证.md
+?? docs/训练性能优化.md
+?? requirements-local.txt
+?? scripts/audit_followups.py
+?? scripts/check_runtime.py
+?? scripts/compare_fixed_control.py
+?? scripts/diagnose_training_readiness.py
+?? scripts/physics_audit.py
+?? scripts/report_contact_profiles.py
+?? scripts/report_force_targets.py
+?? scripts/report_remaining_work.py
+?? scripts/run_local.sh
+?? scripts/train_fixed_offset.py
+?? scripts/validate_fixed_control.py
+?? src/mjlab_peg_hole_search/alignment_hold.py
+?? src/mjlab_peg_hole_search/alignment_hold_v2.py
+?? src/mjlab_peg_hole_search/axial_contact_control.py
+?? src/mjlab_peg_hole_search/contact_validation.py
+?? src/mjlab_peg_hole_search/handoff.py
+?? src/mjlab_peg_hole_search/parallel_conical.py
+?? src/mjlab_peg_hole_search/phase_telemetry.py
+?? src/mjlab_peg_hole_search/validation.py
+?? tests/test_align_braking.py
+?? tests/test_axial_handoff.py
+?? tests/test_channel_budget.py
+?? tests/test_contact_acceptance.py
+?? tests/test_control_constants.py
+?? tests/test_diagnostic_offsets.py
+?? tests/test_direct_capture.py
+?? tests/test_entry_wait.py
+?? tests/test_fault_boundaries.py
+?? tests/test_fixed_control_baseline.py
+?? tests/test_increment_ik.py
+?? tests/test_low_force_capture.py
+?? tests/test_parallel_conical.py
+?? tests/test_progress_termination.py
+?? tests/test_shallow_capture.py
+?? tests/test_stage_configuration.py
+?? tests/test_training_initialization.py

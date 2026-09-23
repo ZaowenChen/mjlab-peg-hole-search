@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible software or simulation problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private data or large binary outputs.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Include the command, configuration, seed and smallest case that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python, CUDA, GPU, MJLab, MuJoCo and MuJoCo-Warp versions.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and safety impact
+      description: Add concise logs or metrics and state whether behavior could affect hardware safety.

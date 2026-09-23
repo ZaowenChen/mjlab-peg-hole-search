@@ -1,0 +1,65 @@
+{
+  "schema": "contact-preparation-design-v1",
+  "status": "design_only_not_executable",
+  "target": "rapid contact preparation with continuous 20 N axial regulation",
+  "controller_implemented": false,
+  "physics_validated": false,
+  "simulation": {
+    "control_dt_s": 0.002,
+    "future_policy_decimation": 20,
+    "initial_axial_gap_m": 0.002,
+    "seed": 7
+  },
+  "force": {
+    "target_force_N": 20.0,
+    "buffer_target_N_candidate": 6.0,
+    "touch_threshold_N_candidate": 3.0,
+    "contact_threshold_N_candidate": 5.0,
+    "buffer_upper_N_candidate": 15.0,
+    "regulation_motion_upper_N_candidate": 30.0,
+    "experimental_run_axial_stop_N_candidate": 40.0,
+    "target_slew_N_per_s_candidate": 40.0,
+    "filter_alpha_candidate": 0.3,
+    "kp_m_per_N_s_candidate": 0.00015,
+    "ki_m_per_N_s2_candidate": 0.0001,
+    "integral_speed_limit_m_per_s_candidate": 0.0003,
+    "anti_windup_tracking_time_s_candidate": 0.5,
+    "note": "buffer_upper only applies to initial acquisition; regulation motion uses a distinct envelope"
+  },
+  "motion": {
+    "baseline_approach_speed_m_per_s": 0.001,
+    "free_space_fast_speed_m_per_s_candidate": 0.003,
+    "near_contact_speed_m_per_s_candidate": 0.001,
+    "minimum_slow_zone_m_candidate": 0.0005,
+    "regulation_advance_limit_m_per_s_candidate": 0.001,
+    "regulation_retreat_limit_m_per_s_candidate": 0.001,
+    "fast_approach_requires_known_surface_height_uncertainty_bound": true,
+    "orientation_reference": "coarse positioning reference; no randomized true hole pose input"
+  },
+  "legacy_outer_safety_reference": {
+    "axial_hard_N": 120.0,
+    "radial_hard_N": 50.0,
+    "bending_hard_Nm": 7.5,
+    "hard_dwell_s": 0.02,
+    "instant_scale": 3.0,
+    "note": "historical outer limits only, not a 20 N quality criterion; new experimental stop is separately proposed"
+  },
+  "performance_goals_not_validated": {
+    "ready_time_typical_range_s": [1.5, 2.5],
+    "ready_evidence_window_s_candidate": 0.1,
+    "force_band_N": [16.0, 24.0],
+    "force_mean_error_N": 2.0,
+    "force_rmse_N": 4.0,
+    "evaluation_hold_s": 2.0,
+    "evaluation_hold_is_not_online_wait": true,
+    "report_raw_and_filtered_separately": true
+  },
+  "scope": {
+    "normal_states": ["APPROACH", "ACQUIRE", "REGULATE"],
+    "fault_takeover_independent": true,
+    "ready_is_output_flag": true,
+    "rotation_probe": "later",
+    "hole_search": "later",
+    "ppo_training": "later"
+  }
+}

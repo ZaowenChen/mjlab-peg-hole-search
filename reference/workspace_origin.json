@@ -1,0 +1,23 @@
+{
+  "format_version": 1,
+  "captured_on": "2026-09-23",
+  "primary_workspace": ".",
+  "history_policy": "The public repository starts from the unified, reviewed workspace snapshot.",
+  "legacy_source": {
+    "path": "legacy-workspace (not distributed)",
+    "head": "8719d823a1c5cbe956b660a8bb2c8c7b64fc4530",
+    "status_entry_count": 253,
+    "status_counts": {
+      "modified": 135,
+      "deleted": 68,
+      "untracked": 50
+    },
+    "porcelain_v1_z_sha256": "8cc82e7993db597c9099872ac5b52c244ab62fa07972fa0b49a8d9b30acd9682",
+    "preservation": "Read-only historical migration source; not included in this repository."
+  },
+  "other_reference_directories": [
+    "early original workspace (not distributed)",
+    "learning-material workspace (not distributed)"
+  ],
+  "large_artifact_policy": "Models, caches, raw trajectories, logs, local runtimes and source snapshot archives remain outside ordinary Git."
+}
