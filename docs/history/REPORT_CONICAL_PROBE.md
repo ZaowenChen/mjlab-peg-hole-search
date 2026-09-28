@@ -1,3 +1,5 @@
+> 历史资料：本文记录其注明日期的实验与计划；当前入口见 [项目 README](../../README.md)，当前状态见 [CURRENT_STATE](../../CURRENT_STATE.md)。
+
 # 锥形探测实现与首轮实验报告
 
 日期：2026-09-22。状态：探测模块、范围实验、留出方向诊断和物理后端复核已完成；尚未验证闭环寻孔、插入或PPO训练。
@@ -37,7 +39,7 @@
 
 数据：`evaluation/probe_pilot_hole/`、`probe_slow_hole/`、`probe_slow_plane/`。
 
-![5 mm四方向实际探测](evaluation/probe_figures/probe_slow_hole_amp_0.05.png)
+![5 mm四方向实际探测](../../evaluation/probe_figures/probe_slow_hole_amp_0.05.png)
 
 ## 2. 范围测试：240条轨迹
 

@@ -44,6 +44,26 @@ class ContactConfig:
     lateral_hold_gain: float = 2.
     lateral_hold_speed: float = .0003
     xy_speed: float = .0002
+    xy_tracking_limits_enabled: bool = False  # candidate: plane support regression; opt in
+    xy_reference_lead: float = .0003  # m, measured control-point reference leash
+    parking_enabled: bool = False  # opt in only after load/support acceptance
+    parking_zero_tolerance: float = 1e-7  # m/s, upstream request
+    parking_resume_tolerance: float = 2e-7  # m/s
+    parking_gate_loss_dwell: float = .01  # s
+    parking_resume_dwell: float = .04  # s
+    parking_position_gain: float = 5.  # 1/s
+    parking_velocity_gain: float = .8  # dimensionless
+    parking_recovery_speed: float = .0015  # m/s
+    parking_recovery_acceleration: float = .015  # m/s^2
+    parking_command_lead: float = .0003  # m
+    parking_lookahead: float = .04  # s
+    parking_lookahead_distance: float = .00005  # m
+    parking_still_speed: float = .00004  # m/s
+    parking_still_position: float = .00002  # m
+    parking_still_dwell: float = .2  # s
+    parking_load_start: float = 22.  # N
+    parking_load_end: float = 28.  # N
+    parking_load_min_fraction: float = .25
     joint_acceleration: float = 3.
     joint_speed: float = .5
     command_energy: float = 1.
@@ -59,8 +79,14 @@ class ContactConfig:
 
     def __post_init__(self):
         for name, value in asdict(self).items():
+            if isinstance(value, bool):
+                continue
             if not math.isfinite(value) or value <= 0:
                 raise ValueError(f'{name} must be finite and positive')
+        if self.parking_zero_tolerance >= self.parking_resume_tolerance:
+            raise ValueError('parking request hysteresis is invalid')
+        if not 0 < self.parking_load_min_fraction <= 1 or not self.parking_load_start < self.parking_load_end <= self.operating_upper:
+            raise ValueError('parking load envelope is invalid')
         if not self.touch_force < self.buffer_force < self.target_force < self.operating_upper < self.axial_stop:
             raise ValueError('inconsistent force targets/envelopes')
         if self.slow_zone >= self.initial_gap or self.slow_speed > self.fast_speed:

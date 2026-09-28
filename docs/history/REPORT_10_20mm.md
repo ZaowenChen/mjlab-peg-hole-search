@@ -1,3 +1,5 @@
+> 历史资料：本文记录其注明日期的实验与计划；当前入口见 [项目 README](../../README.md)，当前状态见 [CURRENT_STATE](../../CURRENT_STATE.md)。
+
 # 10 mm、20 mm 横向偏差接触实验
 
 日期：2026-09-22。延续 [1/2/5 mm 实验报告](REPORT.md)，本次未修改控制器、模型或稳定判据。
@@ -36,7 +38,7 @@
 
 下图为首轮；三轮完整数值见 `evaluation/large_offsets_summary.csv`。
 
-![大偏差原始力曲线](figures/large_offsets_force.png)
+![大偏差原始力曲线](../../figures/large_offsets_force.png)
 
 ## 如何理解大偏差
 

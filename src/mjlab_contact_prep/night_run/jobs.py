@@ -3,8 +3,22 @@ from pathlib import Path
 import numpy as np
 import torch
 from rsl_rl.runners import OnPolicyRunner
-from .environment import BankEnv,prepare_bank,save_json,AUDIT_COLUMNS
+from .environment import BankEnv,prepare_bank,save_json,AUDIT_COLUMNS,SPIKE013_AUDIT_COLUMNS
+from .shallow_hold import PROTOCOL_ID, audit_trace, interval_count
+from mjlab_contact_prep.config import ContactConfig
 ROOT=Path(__file__).resolve().parents[3]
+
+def runtime_config(env):
+    c=env.term.cfg.contact
+    if env.term.controller.cfg is not c or env.term.parking.cfg is not c:
+        raise ValueError('term/controller/parking do not share the effective ContactConfig')
+    return dict(protocol_id=env.protocol_id,physics_dt=float(env.env.physics_dt),
+        simulation_timestep=float(env.env.sim.cfg.mujoco.timestep),
+        decimation=int(env.env.cfg.decimation),repeat=env.repeat,decision_dt=env.dt,
+        history_steps=int(env.history.shape[1]),policy_xy_request_limit_mps=float(c.xy_speed),
+        probe_amplitude_deg=float(env.term.probe.cfg.amplitude_deg),
+        parking_enabled=bool(c.parking_enabled),xy_tracking_limits_enabled=bool(c.xy_tracking_limits_enabled),
+        horizon_steps=env.max_episode_length)
 
 def case(radius,angle,index,bucket,kind):
     return dict(id=f'{kind}_{index:05d}',radius_mm=float(radius),angle_deg=float(angle),dx_mm=float(radius*math.cos(math.radians(angle))),dy_mm=float(radius*math.sin(math.radians(angle))),bucket=bucket,kind=kind)
@@ -38,7 +52,7 @@ def verify_frozen(plan):
         if hashlib.sha256((ROOT/n).read_bytes()).hexdigest()!=h:raise RuntimeError('Frozen experiment source changed: '+n)
 
 def ppo_config(seed,iterations,steps=32):
-    cfg=json.loads((ROOT/'evaluation/gpu_ppo_pilot_v2/amp_0/config.json').read_text())['ppo']
+    cfg=json.loads((ROOT/'configs/ppo.json').read_text())
     cfg.update(seed=seed,max_iterations=iterations,num_steps_per_env=steps,save_interval=1,run_name=f'formal_seed_{seed}',check_for_nan=True)
     # Retain the already validated PPO settings, including lam=0.95 and gamma=0.995.
     return cfg
@@ -53,7 +67,16 @@ def train_job(out,seed,amp,*,bank=None,n=None,iterations=None,steps=32,resume=Tr
     folder=out/f'amp_{amp:g}'/f'seed_{seed}';folder.mkdir(parents=True,exist_ok=True)
     if (folder/'complete.json').exists():return json.loads((folder/'complete.json').read_text())
     n=n or plan['num_envs'];iterations=iterations or plan['iterations'];bank=bank or out/'training_bank/bank.pt'
-    torch.manual_seed(seed);env=BankEnv(bank,n,amp,seed);cfg=ppo_config(seed,iterations,steps)
+    torch.manual_seed(seed)
+    experimental=plan.get('protocol_id')==PROTOCOL_ID
+    effective=plan.get('effective_config',{})
+    env=BankEnv(bank,n,amp,seed,horizon=plan.get('horizon_steps',200),
+        contact=ContactConfig(**effective['contact']) if experimental else None,
+        protocol_id=PROTOCOL_ID if experimental else None,
+        bucket_weights=effective.get('bucket_weights') if experimental else None,
+        expected_fingerprint=plan.get('training_fingerprint') if experimental else None)
+    cfg=ppo_config(seed,iterations,steps)
+    if experimental:save_json(folder/'runtime_config.json',runtime_config(env))
     runner=OnPolicyRunner(env,copy.deepcopy(cfg),str(folder/'logs'),device=env.device)
     initial_hash=model_hash(runner.alg.actor);save_json(folder/'initialization.json',dict(seed=seed,amplitude=amp,actor_sha256=initial_hash))
     counterpart=out/'amp_0'/f'seed_{seed}'/'initialization.json'
@@ -105,13 +128,27 @@ def train_job(out,seed,amp,*,bank=None,n=None,iterations=None,steps=32,resume=Tr
     finally:env.close()
 
 def evaluate_job(out,seed,amp,*,bank=None,checkpoint=None,horizon=200,tag=None):
+    out=Path(out);plan=json.loads((out/'plan.json').read_text());verify_frozen(plan)
+    experimental=plan.get('protocol_id')==PROTOCOL_ID;effective=plan.get('effective_config',{})
+    contact=ContactConfig(**effective['contact']) if experimental else ContactConfig()
+    if experimental:horizon=plan['horizon_steps']
+    decision_dt=contact.dt*20*5;preparation_s=effective.get('preparation_s',6.)
     out=Path(out);folder=out/f'amp_{amp:g}'/f'seed_{seed}';destination=folder/(tag or 'evaluation');destination.mkdir(parents=True,exist_ok=True)
     bank=bank or out/'test_bank/bank.pt';raw=torch.load(bank,weights_only=False,map_location='cpu');count=len(raw['rows'])
-    env=BankEnv(bank,count,amp,seed,autoreset=False,audit=True,horizon=horizon)
+    expected_fingerprint=None
+    if experimental:
+        group=Path(bank).parent.name.removesuffix('_bank')
+        key={'train':'training_fingerprint','validation':'validation_fingerprint','test':'test_fingerprint'}.get(group)
+        if key is None:raise ValueError(f'unknown SPIKE-013 evaluation bank: {bank}')
+        expected_fingerprint=plan[key]
+    env=BankEnv(bank,count,amp,seed,autoreset=False,audit=True,horizon=horizon,contact=contact,
+        protocol_id=PROTOCOL_ID if experimental else None,expected_fingerprint=expected_fingerprint,
+        bucket_weights=effective.get('bucket_weights') if experimental else None)
+    if experimental:save_json(destination/'runtime_config.json',runtime_config(env))
     cfg=ppo_config(seed,1);runner=OnPolicyRunner(env,copy.deepcopy(cfg),None,device=env.device)
     runner.load(str(checkpoint or folder/'policy.pt'),map_location=env.device);policy=runner.get_inference_policy()
     active=torch.tensor([r['eligible'] for r in env.rows],device=env.device);rows=[]
-    for r in env.rows:rows.append(dict(**r,prep_eligible=r['eligible'],success=False,outcome='pending' if r['eligible'] else 'preparation_failed',search_s=None,total_s=None if r['eligible'] else 6.,terminal_samples=0,search_reason=None,capped_time_s=horizon*.2))
+    for r in env.rows:rows.append(dict(**r,prep_eligible=r['eligible'],success=False,outcome='pending' if r['eligible'] else 'preparation_failed',search_s=None,total_s=None if r['eligible'] else preparation_s,terminal_samples=0,search_reason=None,capped_time_s=horizon*decision_dt,protocol_id=PROTOCOL_ID if experimental else None))
     try:
         with torch.inference_mode():
             for step in range(1,horizon+1):
@@ -119,29 +156,66 @@ def evaluate_job(out,seed,amp,*,bank=None,checkpoint=None,horizon=200,tag=None):
                 actions=policy(env.get_observations()).clamp(-1,1);actions[~active]=0
                 _,_,done,_=env.step(actions);dist,depth=env.metrics()
                 for i in torch.nonzero(active&done.bool()).flatten().tolist():
-                    success=bool(env.last_success[i]);reason=int(env.term.controller.reason[i]);elapsed=round(step*.2,3)
-                    rows[i].update(success=success,outcome='success' if success else ('fault' if reason else 'timeout'),search_s=elapsed,total_s=6+elapsed,
-                      terminal_samples=int(env.ticks[i]),search_reason=reason,capped_time_s=elapsed if success else horizon*.2,
+                    success=bool(env.last_success[i]);elapsed=round(step*decision_dt,6)
+                    fault=bool(env.last_fault[i]);protocol=env.shallow_hold
+                    reason=int(protocol.first_fault_reason[i]) if protocol and fault else int(env.term.controller.reason[i])
+                    if experimental and rows[i].get('preparation_captured'):
+                        outcome='preparation_capture_hold_success' if success else ('fault' if fault else 'preparation_capture_hold_timeout')
+                    else:
+                        outcome='success' if success else ('fault' if fault else 'timeout')
+                    rows[i].update(success=success,outcome=outcome,search_s=elapsed,total_s=preparation_s+elapsed,
+                      terminal_samples=int(protocol.ticks[i] if protocol else env.ticks[i]),search_reason=reason,capped_time_s=elapsed if success else horizon*decision_dt,
                       final_error_mm=float(dist[i]*1000),final_depth_mm=float(depth[i]*1000))
+                    if protocol:
+                        rows[i].update(first_capture_s=None if protocol.first_capture_tick[i]<0 else float(protocol.first_capture_tick[i]*contact.dt),
+                            capture_count=int(protocol.capture_count[i]),hold_break_count=int(protocol.hold_break_count[i]),
+                            current_hold_s=max(0,int(protocol.valid_run_samples[i])-1)*contact.dt,
+                            max_hold_s=max(0,int(protocol.max_run_samples[i])-1)*contact.dt,
+                            stable_threshold_s=None if protocol.first_stable_tick[i]<0 else float(protocol.first_stable_tick[i]*contact.dt),
+                            first_fault_reason=int(protocol.first_fault_reason[i]))
                 active &= ~done.bool()
-        trace=torch.stack(env.audit_records).cpu().numpy() if env.audit_records else np.empty((0,count,len(AUDIT_COLUMNS)))
-        np.savez_compressed(destination/'trajectory.npz',trace=trace,columns=AUDIT_COLUMNS)
+        audit_columns=SPIKE013_AUDIT_COLUMNS if experimental else AUDIT_COLUMNS
+        trace=torch.stack(env.audit_records).cpu().numpy() if env.audit_records else np.empty((0,count,len(audit_columns)))
+        np.savez_compressed(destination/'trajectory.npz',trace=trace,columns=audit_columns)
         # Independent reconstruction from saved geometry/reason; does not use the online sample counter.
         reloaded=np.load(destination/'trajectory.npz');t=reloaded['trace'];columns=list(reloaded['columns']);audits=[]
         for i,row in enumerate(rows):
             if not row['prep_eligible']:continue
             x=t[:row['terminal_samples'],i];assert np.isfinite(x).all()
+            if experimental:
+                reconstructed=audit_trace(x,columns,contact.dt,1+interval_count(effective['capture_s'],contact.dt)+interval_count(effective['hold_s'],contact.dt))
+                expected=reconstructed['success'] and not reconstructed['fault'] and not reconstructed['nonfinite']
+                assert row['success']==expected,(row['id'],row['success'],reconstructed)
+                force=x[:,columns.index('Fz')]
+                low=force<5
+                run=0;longest=0
+                for value in low:
+                    run=run+1 if value else 0;longest=max(longest,run)
+                row.update(audited_final_dwell_s=reconstructed['final_dwell_s'],
+                    force_peak_N=float(np.max(np.abs(force))),low_force_total_s=float(np.sum(low)*contact.dt),
+                    low_force_longest_s=float(longest*contact.dt),
+                    policy_request_peak_mps=float(np.linalg.norm(x[:,[columns.index('policy_vx'),columns.index('policy_vy')]],axis=1).max()),
+                    combined_request_peak_mps=float(np.linalg.norm(x[:,[columns.index('combined_vx'),columns.index('combined_vy')]],axis=1).max()),
+                    measured_xy_speed_peak_mps=float(np.linalg.norm(x[:,[columns.index('actual_vx'),columns.index('actual_vy')]],axis=1).max()))
+                audits.append(True)
+                continue
             mask=(x[:,columns.index('radial_m')]<=.00015)&(x[:,columns.index('depth_m')]>=.0001)&(x[:,columns.index('reason')]==0)
             bad=np.flatnonzero(~mask);tail=len(mask)-(int(bad[-1])+1 if len(bad) else 0)
-            duration=max(0,tail-1)*.002
+            duration=max(0,tail-1)*contact.dt
             expected=duration>=.2-1e-9 and int(x[-1,columns.index('reason')])==0
             assert row['success']==expected,(row['id'],row['success'],duration)
             assert int(x[-1,columns.index('reason')])==row['search_reason']
-            if len(x)>1:assert np.allclose(np.diff(x[:,0]),.002,atol=4e-6)
+            if len(x)>1:assert np.allclose(np.diff(x[:,0]),contact.dt,atol=4e-6)
             row['audited_final_dwell_s']=duration;audits.append(True)
         result=dict(seed=seed,amplitude=amp,total=count,eligible=sum(x['prep_eligible'] for x in rows),successes=sum(x['success'] for x in rows),
           preparation_failures=sum(not x['prep_eligible'] for x in rows),faults=sum(x['outcome']=='fault' for x in rows),
           mean_capped_time_s=float(np.mean([x['capped_time_s'] for x in rows])),mean_observed_total_s=float(np.mean([x['total_s'] for x in rows])),audit_passed=all(audits),rows=rows)
+        if experimental:
+            result.update(protocol_id=PROTOCOL_ID,
+                ppo_successes=sum(x['outcome']=='success' for x in rows),
+                eligible_nonprepcapture=sum(x['prep_eligible'] and not x.get('preparation_captured',False) for x in rows),
+                preparation_captures=sum(x.get('preparation_captured',False) for x in rows),
+                preparation_capture_hold_successes=sum(x['outcome']=='preparation_capture_hold_success' for x in rows))
         save_json(destination/'results.json',result);return result
     finally:env.close()
 

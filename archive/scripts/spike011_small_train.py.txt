@@ -1,0 +1,195 @@
+"""Small, single-seed 1 mm/s PPO experiment using the frozen contact plant."""
+
+import argparse
+import hashlib
+import json
+import math
+from dataclasses import replace
+from pathlib import Path
+
+import numpy as np
+import torch
+
+from mjlab_contact_prep.config import ContactConfig
+from mjlab_contact_prep.night_run.environment import BankEnv, save_json
+from mjlab_contact_prep.night_run import jobs
+
+
+ROOT = Path(__file__).resolve().parents[1]
+BASE = ROOT / "evaluation/night_fullcircle_5mm_v1"
+OUTPUT = ROOT / "evaluation/spike011_small_1mms_v1"
+SEED = 7
+UPDATES = 64
+ENVS = 128
+STEPS = 32
+
+
+def digest(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def test_cases():
+    cases = []
+    for radius in (.5, 1., 2., 5.):
+        for j in range(8):
+            angle = 3. + 45. * j
+            cases.append(jobs.case(radius, angle, len(cases),
+                                   0 if radius <= 1.5 else (1 if radius <= 3 else 2), "grid"))
+    cases += jobs.random_cases(16, 2026092311, "random")
+    old = json.loads((BASE / "plan.json").read_text())
+    known = {(round(x["dx_mm"], 8), round(x["dy_mm"], 8)) for x in old["train_cases"] + old["test_cases"]}
+    known.update((round(x["dx_mm"], 8), round(x["dy_mm"], 8))
+                 for x in json.loads((ROOT / "evaluation/xy_speed_formal_v1/plan.json").read_text())["cases"])
+    assert not any((round(x["dx_mm"], 8), round(x["dy_mm"], 8)) in known for x in cases)
+    return cases
+
+
+def prepare():
+    OUTPUT.mkdir(parents=True, exist_ok=False)
+    old_plan = json.loads((BASE / "plan.json").read_text())
+    jobs.verify_frozen(old_plan)
+    raw = torch.load(BASE / "training_bank/bank.pt", weights_only=False, map_location="cpu")
+    rng = np.random.default_rng(2026092310)
+    selected = []
+    for band in range(3):
+        eligible = [i for i, row in enumerate(raw["rows"]) if row["eligible"] and row["bucket"] == band]
+        if len(eligible) < 256:
+            raise RuntimeError(f"radius band {band} has only {len(eligible)} usable training states")
+        selected.extend(sorted(rng.choice(eligible, 256, replace=False).tolist()))
+    bank = {group: {name: value[selected].clone() for name, value in raw[group].items()}
+            for group in ("physics", "controller", "term", "probe")}
+    bank["rows"] = [raw["rows"][i] for i in selected]
+    (OUTPUT / "training_bank").mkdir()
+    torch.save(bank, OUTPUT / "training_bank/bank.pt")
+    save_json(OUTPUT / "training_bank/selected_indices.json", selected)
+    plan = {
+        "design": "MPHS SPIKE-011 v1.1", "seed": SEED, "seeds": [SEED],
+        "num_envs": ENVS, "iterations": UPDATES, "steps_per_update": STEPS,
+        "samples_per_seed": ENVS * UPDATES * STEPS,
+        "queue_order": [{"amplitude": 0., "seed": SEED}],
+        "training_bank_sha256": digest(OUTPUT / "training_bank/bank.pt"),
+        "training_source_bank_sha256": digest(BASE / "training_bank/bank.pt"),
+        "source_plan_sha256": digest(BASE / "plan.json"),
+        "experiment_source_sha256": {"scripts/spike011_small_train.py": digest(__file__)},
+        "physics_frozen": old_plan["physics_frozen"],
+        "test_cases": test_cases(),
+        "xy_request_cap_m_s": .001,
+        "policy": "fresh seed 7; no rocking; no true-radius switch",
+        "capture": "101 consecutive 2ms samples; gate XY from first confirming physical sample; hold to decision end in training",
+        "reward": "original coefficients; corrected capture event timing",
+        "test": "same independent 48 starts for old .2, old 1.0, new 1.0; 0.5s hold",
+    }
+    save_json(OUTPUT / "plan.json", plan)
+    save_json(OUTPUT / "progress.json", {"stage": "prepared", "selected_training_states": len(selected)})
+    print("PREPARED", len(selected), "states", len(plan["test_cases"]), "test positions", flush=True)
+
+
+class FastBankEnv(BankEnv):
+    """Keep the original PPO task and fix the fast capture/hold timing."""
+
+    def __init__(self, *args, **kwargs):
+        self.first_capture = None
+        super().__init__(*args, **kwargs)
+        config = replace(ContactConfig(), xy_speed=.001)
+        self.term.cfg.contact = config
+        self.term.controller.cfg = config
+        self.first_capture = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
+        original = self.term.apply_actions
+
+        def physics_sample():
+            term = self.term
+            radius, depth = self.metrics()
+            pos = self.env.sim.data.site_xpos[:, term.geometry_id].clone()
+            eligible = ((radius <= .00015) & (depth >= .0001) &
+                        (term.controller.reason == 0) & torch.isfinite(radius) & torch.isfinite(depth))
+            impending = eligible & (self.inside_samples >= 100) & ~self.first_capture
+            if bool(impending.any()):
+                self.reanchor_xy(impending, pos)
+            gate = self.first_capture | impending
+            if bool(gate.any()):
+                term.xy_action[gate] = 0
+                term.controller.xy_reference[gate, :2] = pos[gate, :2]
+            original()
+            newly = impending & (term.controller.reason == 0) & (self.inside_samples >= 101)
+            self.first_capture |= newly
+            # Hold the event through the remainder of this 0.2 s decision.
+            self.inside_samples[self.first_capture] = 101
+
+        self.term.apply_actions = physics_sample
+
+    def reanchor_xy(self, mask, pos):
+        term = self.term
+        term._point_torch[:] = pos
+        term._compute_jacobian()
+        jac = torch.cat((term._jacp_torch[:, :, term._joint_dof_ids],
+                         term._jacr_torch[:, :, term._joint_dof_ids]), dim=1)
+        actual = term._entity.data.joint_pos[:, term._joint_ids]
+        lead = (jac @ (term.command - actual.double()).float()[:, :, None]).squeeze(-1)
+        matrix = jac.transpose(1, 2) @ jac
+        matrix.diagonal(dim1=-2, dim2=-1).add_(term.cfg.damping ** 2)
+        target = torch.zeros_like(lead)
+        target[:, :2] = lead[:, :2]
+        correction = torch.linalg.solve(matrix, (jac.transpose(1, 2) @ target[:, :, None]).squeeze(-1))
+        term.command[mask] -= correction[mask].double()
+        velocity = (jac @ term.qvelocity[:, :, None]).squeeze(-1)
+        target.zero_()
+        target[:, :2] = velocity[:, :2]
+        correction_v = torch.linalg.solve(matrix, (jac.transpose(1, 2) @ target[:, :, None]).squeeze(-1))
+        term.qvelocity[mask] -= correction_v[mask]
+
+    def restore(self, ids, pick):
+        super().restore(ids, pick)
+        if self.first_capture is not None:
+            self.first_capture[ids] = False
+
+    def snapshot(self):
+        state = super().snapshot()
+        state["first_capture"] = self.first_capture.detach().cpu().clone()
+        return state
+
+    def restore_snapshot(self, state):
+        super().restore_snapshot(state)
+        self.first_capture[:] = state["first_capture"].to(self.device)
+
+
+def smoke():
+    plan = json.loads((OUTPUT / "plan.json").read_text())
+    jobs.verify_frozen(plan)
+    bank = OUTPUT / "training_bank/bank.pt"
+    env = FastBankEnv(bank, 8, 0., SEED)
+    try:
+        with torch.inference_mode():
+            state = env.snapshot()
+            obs = env.get_observations()["actor"].clone()
+            env.step(torch.ones((8, 2), device=env.device))
+            env.restore_snapshot(state)
+            assert torch.equal(obs, env.get_observations()["actor"])
+            assert torch.equal(env.first_capture.cpu(), state["first_capture"])
+            assert abs(env.term.controller.cfg.xy_speed - .001) < 1e-12
+    finally:
+        env.close()
+    save_json(OUTPUT / "smoke.json", {"passed": True, "snapshot_observation_identity": True,
+                                      "xy_request_cap_m_s": .001, "formal_samples": 0})
+    print("SMOKE_PASSED", flush=True)
+
+
+def train():
+    plan = json.loads((OUTPUT / "plan.json").read_text())
+    jobs.verify_frozen(plan)
+    jobs.BankEnv = FastBankEnv
+    result = jobs.train_job(OUTPUT, SEED, 0., bank=OUTPUT / "training_bank/bank.pt",
+                            n=ENVS, iterations=UPDATES, steps=STEPS, resume=True)
+    save_json(OUTPUT / "progress.json", {"stage": "trained", "samples": result["transitions"],
+                                            "policy": result["final_checkpoint"]})
+    print("TRAINED", result["transitions"], result["final_checkpoint"], flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("stage", choices=("prepare", "smoke", "train"))
+    args = parser.parse_args()
+    {"prepare": prepare, "smoke": smoke, "train": train}[args.stage]()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,18 @@
+{
+  "format_version": 1,
+  "protocol_id": "autonomous_shallow_hold_v1",
+  "contact": {"dt": 0.002, "xy_speed": 0.001, "parking_enabled": false, "xy_tracking_limits_enabled": false},
+  "physics_dt": 0.002,
+  "decimation": 20,
+  "repeat": 5,
+  "history_steps": 32,
+  "preparation_s": 6.0,
+  "search_s": 40.0,
+  "capture_s": 0.2,
+  "hold_s": 0.5,
+  "probe_amplitude_deg": 0.0,
+  "bands_mm": [[0.5, 1.5], [1.5, 3.0], [3.0, 5.0], [5.0, 7.5], [7.5, 10.0]],
+  "bucket_weights": [0.2, 0.2, 0.2, 0.2, 0.2],
+  "train_seed": 2026092401,
+  "test_seed": 2026092402
+}

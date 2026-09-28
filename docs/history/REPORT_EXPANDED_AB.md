@@ -1,3 +1,5 @@
+> 历史资料：本文记录其注明日期的实验与计划；当前入口见 [项目 README](../../README.md)，当前状态见 [CURRENT_STATE](../../CURRENT_STATE.md)。
+
 # 扩展孔位与大偏差：PPO 无摆动／有摆动对照
 
 ## 结论摘要

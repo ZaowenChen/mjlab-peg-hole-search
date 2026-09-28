@@ -41,6 +41,7 @@ class SearchEnv:
         self.ctrl_bank={n:v.clone() for n,v in vars(t.controller).items() if isinstance(v,torch.Tensor)}
         self.term_bank={n:getattr(t,n).clone() for n in ['command','qvelocity','xy_action']}
         self.probe_bank={n:v.clone() for n,v in vars(t.probe).items() if isinstance(v,torch.Tensor)}
+        self.parking_bank=t.parking.state_dict()
         from dataclasses import replace
         t.probe.cfg=replace(t.probe.cfg,amplitude_deg=amplitude_deg)
         self.episode_length_buf=torch.zeros(num_envs,dtype=torch.long,device=self.device)
@@ -80,6 +81,7 @@ class SearchEnv:
         for n,v in self.ctrl_bank.items():getattr(self.term.controller,n)[ids]=v[pick]
         for n,v in self.term_bank.items():getattr(self.term,n)[ids]=v[pick]
         for n,v in self.probe_bank.items():getattr(self.term.probe,n)[ids]=v[pick]
+        self.term.parking.load_state_dict(self.parking_bank,ids,pick)
         self.env.sim.forward();self.term.read_wrench()
         self.origin[ids]=self.env.sim.data.site_xpos[ids,self.term.geometry_id]
         self.episode_length_buf[ids]=0;self.last_action[ids]=0;self.capture_dwell[ids]=0;self.returns[ids]=0

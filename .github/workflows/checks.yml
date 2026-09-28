@@ -17,6 +17,13 @@ jobs:
           python-version: "3.10"
       - name: Compile Python sources
         run: python -m compileall -q src scripts tests
+      - name: Portable configuration, frozen source and layout tests
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m unittest discover -s tests -p 'test_configuration.py' -v
+          python -m unittest discover -s tests -p 'test_frozen_source.py' -v
+          python -m unittest discover -s tests -p 'test_repository_layout.py' -v
       - name: Validate committed JSON
         run: |
           python - <<'PY'

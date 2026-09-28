@@ -46,6 +46,22 @@ def _parse_override_value(raw: str) -> Any:
         return raw
 
 
+def parse_typed_override(raw: str, default: Any) -> Any:
+    """Parse a CLI value without treating the string 'false' as truthy."""
+    value = _parse_override_value(raw)
+    if isinstance(default, bool):
+        valid = isinstance(value, bool)
+    elif isinstance(default, int):
+        valid = isinstance(value, int) and not isinstance(value, bool)
+    elif isinstance(default, float):
+        valid = isinstance(value, (int, float)) and not isinstance(value, bool)
+    else:
+        valid = isinstance(value, type(default))
+    if not valid:
+        raise ValueError(f"expected {type(default).__name__} value, got {raw!r}")
+    return type(default)(value)
+
+
 def apply_overrides(config: Mapping[str, Any], overrides: Iterable[str]) -> dict[str, Any]:
     """Apply dotted ``KEY=VALUE`` overrides, parsing values as JSON when possible."""
     result = copy.deepcopy(dict(config))
@@ -76,6 +92,8 @@ def resolve_config(
     default = _read_json(default_path)
     experiment = _read_json(experiment_path)
     effective = apply_overrides(deep_merge(default, experiment), overrides)
+    if effective.get("format_version", CONFIG_FORMAT_VERSION) != CONFIG_FORMAT_VERSION:
+        raise ValueError("unsupported configuration format_version override")
     effective["format_version"] = CONFIG_FORMAT_VERSION
     return {
         "format_version": CONFIG_FORMAT_VERSION,

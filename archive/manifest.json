@@ -1,0 +1,171 @@
+{
+  "format_version": 1,
+  "archived_on": "2026-09-28",
+  "files": [
+    {
+      "original_path": "scripts/night_preflight.py",
+      "archived_path": "archive/scripts/night_preflight.py.txt",
+      "sha256": "c6e9800a3f3d5d13c170f74c6818ee9d6e0c24d65c2a29fb36d818479c36913f"
+    },
+    {
+      "original_path": "scripts/night_experiment.py",
+      "archived_path": "archive/scripts/night_experiment.py.txt",
+      "sha256": "59d4df8ef385fe62a19e20875c95f44c6c33b9aedf69c69d5f3c00c780a90122"
+    },
+    {
+      "original_path": "scripts/train_search_pilot.py",
+      "archived_path": "archive/scripts/train_search_pilot.py.txt",
+      "sha256": "de27fffd1b75c2bc2453ce498caaa8fa2c5c27943c5a60623d875ed0945c723b"
+    },
+    {
+      "original_path": "scripts/train_expanded_comparison.py",
+      "archived_path": "archive/scripts/train_expanded_comparison.py.txt",
+      "sha256": "33bbd6d78494f4c1da3dd1ae08cd213e15863d1d1d33e9514c6bc1f115908495"
+    },
+    {
+      "original_path": "scripts/train_wide_range_comparison.py",
+      "archived_path": "archive/scripts/train_wide_range_comparison.py.txt",
+      "sha256": "9968e6c9f0d79d5a9d5c16f45a8dc736198cb89756274a8f39b9d49a827f696e"
+    },
+    {
+      "original_path": "scripts/make_report.py",
+      "archived_path": "archive/scripts/make_report.py.txt",
+      "sha256": "f06e2595f59c1ddd120112bf2b1a7c5922194f2f6c1ac9fa35423b0486ab8e14"
+    },
+    {
+      "original_path": "scripts/report_large_offsets.py",
+      "archived_path": "archive/scripts/report_large_offsets.py.txt",
+      "sha256": "792ed1797bfa87256e1edc04f9e7772edc43ccb7721be115f98d0c9f56cb1cd9"
+    },
+    {
+      "original_path": "scripts/report_expanded_comparison.py",
+      "archived_path": "archive/scripts/report_expanded_comparison.py.txt",
+      "sha256": "55ab4a8f31fdbb6d81615bcd0ed4ea110d728ecd526b14d2328366ea0c44d9be"
+    },
+    {
+      "original_path": "scripts/verify_expanded_results.py",
+      "archived_path": "archive/scripts/verify_expanded_results.py.txt",
+      "sha256": "893b79d0bd7bf327c4b31cdad9fa321089f6a43f10f2e795d48aebf0098ca191"
+    },
+    {
+      "original_path": "scripts/spike011_small_train.py",
+      "archived_path": "archive/scripts/spike011_small_train.py.txt",
+      "sha256": "d9016d86044da01149e3b6141cb56c82f1f5cc0640601a422aa7aa6f7b23655c"
+    },
+    {
+      "original_path": "scripts/spike011_small_test.py",
+      "archived_path": "archive/scripts/spike011_small_test.py.txt",
+      "sha256": "1b48722eec92965839738e3e96a504a5d682733f6c7a57b3b5de86aee1e710d9"
+    },
+    {
+      "original_path": "scripts/render_spike011_replay.py",
+      "archived_path": "archive/scripts/render_spike011_replay.py.txt",
+      "sha256": "78fa24cb05de4dfd8cf2b10923a762d898932053a47ee96710e2a94fb8cfa994"
+    },
+    {
+      "original_path": "scripts/render_spike011_matrix.py",
+      "archived_path": "archive/scripts/render_spike011_matrix.py.txt",
+      "sha256": "ee1aa80cf53826854887377215a50ea9d459941523f2f5b46a982fc0ec395c36"
+    },
+    {
+      "original_path": "scripts/ablate_overlap_contacts.py",
+      "archived_path": "archive/scripts/ablate_overlap_contacts.py.txt",
+      "sha256": "7209016fd69b51c77a80f9378a4b658765248df372f83634e735bc755aaa3460"
+    },
+    {
+      "original_path": "scripts/analyze_contact_overlap.py",
+      "archived_path": "archive/scripts/analyze_contact_overlap.py.txt",
+      "sha256": "46fec19702e01e53c5a722802fe381d278f2833217a588ec97cf87ab418a8573"
+    },
+    {
+      "original_path": "scripts/analyze_probe.py",
+      "archived_path": "archive/scripts/analyze_probe.py.txt",
+      "sha256": "07cc138934713cb793d894022c253cebcc306475023aa939b69809867f6baf2e"
+    },
+    {
+      "original_path": "scripts/check_collision_origin.py",
+      "archived_path": "archive/scripts/check_collision_origin.py.txt",
+      "sha256": "50a7b7b2def674eb99d1d13eb626121ea2f7e3c2c465af4bf04a18cef40e00f2"
+    },
+    {
+      "original_path": "scripts/check_direction_response.py",
+      "archived_path": "archive/scripts/check_direction_response.py.txt",
+      "sha256": "9d8c50a0cdf6b15169f5047699191b5a4d1ac18044acd4a8354920d34eaaa9c5"
+    },
+    {
+      "original_path": "scripts/check_gpu_handoff.py",
+      "archived_path": "archive/scripts/check_gpu_handoff.py.txt",
+      "sha256": "cd808e930c761097a82dab29854476bcc02a984bb92f140a9cab5641d4a32a5e"
+    },
+    {
+      "original_path": "scripts/check_gpu_reset.py",
+      "archived_path": "archive/scripts/check_gpu_reset.py.txt",
+      "sha256": "d5c3b77980fdf8f4c1da3e0dce8bc584933669f1815a22c2324f7f3a904f01b9"
+    },
+    {
+      "original_path": "scripts/check_hole_partition.py",
+      "archived_path": "archive/scripts/check_hole_partition.py.txt",
+      "sha256": "50218203a1154acca271076a7ef4908c1b922dc0e3d8a98ff5b9978a76925bae"
+    },
+    {
+      "original_path": "scripts/check_search_cache.py",
+      "archived_path": "archive/scripts/check_search_cache.py.txt",
+      "sha256": "a9f5d6c83eb3e0b564eeb4dd4bd264fddf9b086e76312267d3f2bf7cfb325519"
+    },
+    {
+      "original_path": "scripts/diagnose_contact.py",
+      "archived_path": "archive/scripts/diagnose_contact.py.txt",
+      "sha256": "a5d97f5e6186bad0075c90b50a29c88463dda869392f7d6cd769461df4e1e916"
+    },
+    {
+      "original_path": "scripts/diagnose_readiness.py",
+      "archived_path": "archive/scripts/diagnose_readiness.py.txt",
+      "sha256": "0579ed5337e704a0c7cc9946393f33328cdd785dd0bd493482880f14acdd85ef"
+    },
+    {
+      "original_path": "scripts/diagnose_repaired_peak.py",
+      "archived_path": "archive/scripts/diagnose_repaired_peak.py.txt",
+      "sha256": "426c6ab7808793b74575784d8561daada5290761cff45223c047b43705f8ca7a"
+    },
+    {
+      "original_path": "scripts/evaluate_probe_information.py",
+      "archived_path": "archive/scripts/evaluate_probe_information.py.txt",
+      "sha256": "2cdf7fd482b8a1f05aa018c8850fabdcf9bf5f3cb25a443ff5bbfa9e8f49fce7"
+    },
+    {
+      "original_path": "scripts/evaluate_unseen_holes.py",
+      "archived_path": "archive/scripts/evaluate_unseen_holes.py.txt",
+      "sha256": "fcb5c9017381ad93ba55c4f4a235bd93ac0b147467609334e952dd556dda319f"
+    },
+    {
+      "original_path": "scripts/inspect_probe_contacts.py",
+      "archived_path": "archive/scripts/inspect_probe_contacts.py.txt",
+      "sha256": "0372367b0b4882335832ecaed2f8cffd793c26f42fd6811e6dc360f84fb90b24"
+    },
+    {
+      "original_path": "scripts/localize_probe_contacts.py",
+      "archived_path": "archive/scripts/localize_probe_contacts.py.txt",
+      "sha256": "24547998cab8af8139989dc3c697d6351e9025f067f6b08f7f0b3e06cd0a49ef"
+    },
+    {
+      "original_path": "configs/contact_20n.draft.json",
+      "archived_path": "archive/configs/contact_20n.draft.json",
+      "sha256": "7bd36589777450ff841bce3b5f4ce1d0b823b749c9e97ef25b39a442658ced95"
+    },
+    {
+      "original_path": "configs/contact_20n.effective.json",
+      "archived_path": "archive/configs/contact_20n.effective.json",
+      "sha256": "08aa7c528595443117945bdab0a4e708f41cbfb9d217dec2ee26f9b46be40f9c"
+    },
+    {
+      "original_path": "configs/search_range_10mm.json",
+      "archived_path": "archive/configs/search_range_10mm.json",
+      "sha256": "7cf918810f34cf1a1ddf490375a28e8c987e00345efb9681e3dfaa38ab6a49c3"
+    },
+    {
+      "original_path": "configs/search_range_20mm.json",
+      "archived_path": "archive/configs/search_range_20mm.json",
+      "sha256": "e556248068b44d4f0f1cecf8c6452f4a49b318da102f2a41f9daaf768ffc35ca"
+    }
+  ]
+}

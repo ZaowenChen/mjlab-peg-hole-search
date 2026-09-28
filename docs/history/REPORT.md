@@ -1,3 +1,5 @@
+> 历史资料：本文记录其注明日期的实验与计划；当前入口见 [项目 README](../../README.md)，当前状态见 [CURRENT_STATE](../../CURRENT_STATE.md)。
+
 # 20 N 接触流程重构与实验结果
 
 日期：2026-09-22。工作区：本仓库根目录。
@@ -57,7 +59,7 @@
 | 5mm_yp | 1.85 | 未通过 | 未通过 | 否 | 35.01 | 3.47 |
 | 5mm_ym | 2.08 | 3.33 | 5.08 | 否 | 26.17 | 4.22 |
 
-![首轮全部原始力曲线](figures/force_offsets.png)
+![首轮全部原始力曲线](../../figures/force_offsets.png)
 
 三轮最终实验均未触发 40 N 等硬故障，但“没有故障”不等于“稳定”。1 mm 最后 2 s 的原始力 RMSE 为 0.38–1.03 N。2 mm、5 mm 的部分方向均值接近 20 N，却仍有明显高频跳变。1 mm 主实验的最终径向偏差约 0.68–0.91 mm，说明仍有接触顺应位移；本轮没有承诺完全消除横向位移。
 
@@ -73,7 +75,7 @@
 
 最终同一控制器在平面上的首次接触为 1.89 s，稳定建立为 3.60 s，连续 2 s 确认为 5.35 s，并保持到 8 s。轴向峰值 21.47 N，末段力 RMSE 0.35 N。
 
-![最终平面控制曲线](figures/plane_contact.png)
+![最终平面控制曲线](../../figures/plane_contact.png)
 
 交接测试在 6.0–6.5 s 请求局部 X 方向 0.2 mm/s，即累计 0.1 mm。不能只看请求量；实际位置执行有明显滞后：
 
@@ -102,7 +104,7 @@
 
 ## 可复现资料
 
-- 入口与命令见 [README.md](README.md)。
+- 入口与命令见 [README.md](../../README.md)。
 - 三轮正式结果：`evaluation/final_offsets`、`evaluation/final_repeat2`、`evaluation/final_repeat3`。每轮均有完整 `trace.npz`、有效 `config.json`、代码/模型哈希、运行路径和 `status.json`；`performance_all_passed` 均为 false。
 - 汇总：`evaluation/final_summary.csv`、`evaluation/aggregate.json`。曲线生成脚本：`scripts/make_report.py`。
 - 对照：`evaluation/conservative_approach`、`evaluation/final_plane`、`evaluation/final_handoff`。

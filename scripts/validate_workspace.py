@@ -13,6 +13,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from mjlab_contact_prep.frozen_source import resolve_frozen_source
+
 
 ROOT = Path(__file__).resolve().parents[1]
 FORMAL = ROOT / "evaluation/night_fullcircle_5mm_v1"
@@ -38,7 +40,7 @@ class Audit:
         return all(bool(item["ok"]) for item in self.checks)
 
 
-def audit_workspace(load_payloads: bool = True) -> Audit:
+def audit_workspace(load_payloads: bool = True, compare_working_tree: bool = False) -> Audit:
     audit = Audit()
     required = [
         ROOT / "README.md",
@@ -72,14 +74,14 @@ def audit_workspace(load_payloads: bool = True) -> Audit:
                 path = ROOT / relative
                 if not path.is_file() or sha256(path) != expected:
                     mismatches.append(relative)
-        audit.check(
-            "formal frozen source hashes",
-            not mismatches,
-            "mismatches=" + ",".join(mismatches),
-        )
-    except (OSError, json.JSONDecodeError) as exc:
+        resolved = resolve_frozen_source(plan, ROOT, FORMAL)
+        audit.check("formal frozen source snapshots", True, f"verified={len(resolved)} files")
+        if compare_working_tree:
+            audit.check("working tree matches formal source", not mismatches,
+                        "mismatches=" + ",".join(mismatches))
+    except (OSError, ValueError) as exc:
         plan = {}
-        audit.check("formal frozen source hashes", False, repr(exc))
+        audit.check("formal frozen source snapshots", False, repr(exc))
 
     policies = [
         FORMAL / f"amp_{amp}/seed_{seed}/policy.pt"
@@ -151,8 +153,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--skip-payloads", action="store_true", help="check paths and hashes without torch/NumPy payload loading")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--compare-working-tree", action="store_true",
+                        help="also require current development files to match the historical experiment")
     args = parser.parse_args()
-    audit = audit_workspace(load_payloads=not args.skip_payloads)
+    audit = audit_workspace(load_payloads=not args.skip_payloads,
+                            compare_working_tree=args.compare_working_tree)
     if args.json:
         print(json.dumps({"ok": audit.ok, "checks": audit.checks}, ensure_ascii=False, indent=2))
     else:

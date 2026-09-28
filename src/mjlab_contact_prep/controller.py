@@ -35,6 +35,9 @@ class ContactController:
         self.xy_reference = self.anchor_pos.clone()
         self.last_xy = self.anchor_pos.clone()
         self.last_twist = torch.zeros(count, 6, device=device, dtype=dtype)
+        # Optional experiment-only permission; the production ready gate is unchanged.
+        self.diagnostic_xy_permission = None
+        self.diagnostic_free_hold = False
         self.history = torch.zeros(count, round(cfg.ready_window/cfg.dt), device=device, dtype=dtype)
         self.history_count = torch.zeros_like(self.state)
         self.cursor = torch.zeros_like(self.state)
@@ -47,13 +50,33 @@ class ContactController:
         self.anchor_rot[ids] = torch.eye(3, device=self.device, dtype=self.anchor_rot.dtype)
         self.last_rot[ids] = torch.eye(3, device=self.device, dtype=self.anchor_rot.dtype)
 
-    def step(self, wrench, sensor_wrench, pos, rot, xy_action, control_rotation=None):
+    def step(self, wrench, sensor_wrench, pos, rot, xy_action, control_rotation=None, defer_xy_reference=False):
         c, dt = self.cfg, self.cfg.dt
         fresh = ~self.initialized
         self.anchor_pos[:] = torch.where(fresh[:, None], pos, self.anchor_pos)
         self.xy_reference[:] = torch.where(fresh[:, None], pos, self.xy_reference)
         self.anchor_rot[:] = torch.where(fresh[:, None, None], rot, self.anchor_rot)
         self.last_rot[:] = torch.where(fresh[:, None, None], rot, self.last_rot)
+        if self.diagnostic_free_hold:
+            # Free-space rig only: keep initial axial pose and attitude while
+            # exercising the ordinary XY reference update and execution chain.
+            frame = self.anchor_rot if control_rotation is None else control_rotation
+            local = torch.cat((bounded(xy_action, 1.) * c.xy_speed,
+                               torch.zeros_like(xy_action[:, :1])), -1)
+            requested = (frame @ local[:, :, None]).squeeze(-1)
+            permission = self.diagnostic_xy_permission
+            if permission is None:
+                permission = torch.zeros_like(self.ready)
+            requested = torch.where(permission[:, None], requested, 0)
+            if not defer_xy_reference:
+                self.xy_reference += requested * dt
+            self.last_xy[:] = requested
+            self.velocity.zero_()
+            self.ready.zero_()
+            self.last_twist.zero_()
+            self.initialized[:] = True
+            self.elapsed += dt
+            return self.last_twist
         raw = wrench[:, 2]
         self.filtered_force[:] = torch.where(fresh, raw, (1-c.filter_alpha)*self.filtered_force+c.filter_alpha*raw)
         self.initialized[:] = True
@@ -139,8 +162,10 @@ class ContactController:
         requested_xy = bounded(xy_action,1.) * c.xy_speed
         requested_xy = torch.cat((requested_xy,torch.zeros_like(raw[:,None])),dim=-1)
         requested_world = (frame @ requested_xy[:,:,None]).squeeze(-1)
-        requested_world = torch.where(self.ready[:,None],requested_world,0)
-        self.xy_reference += requested_world*dt
+        permission = self.ready if self.diagnostic_xy_permission is None else self.diagnostic_xy_permission
+        requested_world = torch.where(permission[:,None],requested_world,0)
+        if not defer_xy_reference:
+            self.xy_reference += requested_world*dt
         delta = self.xy_reference-pos
         lateral = delta-(delta*axis).sum(-1)[:,None]*axis
         lateral = bounded(c.lateral_hold_gain*lateral,c.lateral_hold_speed)

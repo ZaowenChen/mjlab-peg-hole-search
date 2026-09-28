@@ -1,3 +1,5 @@
+> 历史资料：本文记录其注明日期的实验与计划；当前入口见 [项目 README](../../README.md)，当前状态见 [CURRENT_STATE](../../CURRENT_STATE.md)。
+
 # GPU 接触交接与 PPO 小规模实验
 
 ## 当前决定

@@ -12,6 +12,7 @@ import numpy as np
 import torch
 from mjlab.envs import ManagerBasedRlEnv
 from mjlab_contact_prep.config import ContactConfig
+from mjlab_contact_prep.configuration import parse_typed_override
 from mjlab_contact_prep.environment import make_env
 from mjlab_contact_prep.backend import backend_metadata
 from mjlab_contact_prep.execution import COLUMNS
@@ -40,9 +41,11 @@ def main():
     cfg=ContactConfig()
     updates={}
     for item in args.set:
+        if '=' not in item:p.error('setting must be KEY=VALUE')
         key,value=item.split('=',1)
         if key not in asdict(cfg):p.error(f'unknown setting {key}')
-        updates[key]=type(getattr(cfg,key))(value)
+        try:updates[key]=parse_typed_override(value,getattr(cfg,key))
+        except ValueError as exc:p.error(str(exc))
     cfg=replace(cfg,**updates)
     directions={'xp':(1,0),'xm':(-1,0),'yp':(0,1),'ym':(0,-1)}
     cases=[dict(id=f'{offset:g}mm_{direction}',dx_mm=offset*directions[direction][0],dy_mm=offset*directions[direction][1],ry_deg=args.tilt_deg) for offset in args.offsets_mm for direction in args.directions]

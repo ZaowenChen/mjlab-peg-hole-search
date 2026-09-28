@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from mjlab_contact_prep.configuration import resolve_config, write_effective_config
+from mjlab_contact_prep.configuration import parse_typed_override, resolve_config, write_effective_config
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -40,6 +40,23 @@ class ConfigurationTests(unittest.TestCase):
             path.write_text('{"format_version": 99}')
             with self.assertRaises(ValueError):
                 resolve_config(path)
+
+    def test_cli_false_disables_boolean_and_wrong_types_are_rejected(self):
+        self.assertIs(parse_typed_override('false', True), False)
+        self.assertIs(parse_typed_override('true', False), True)
+        for value in ('0', '1', 'False', '"false"'):
+            with self.assertRaises(ValueError):
+                parse_typed_override(value, False)
+        self.assertEqual(parse_typed_override('1e-3', .002), .001)
+        with self.assertRaises(ValueError):
+            parse_typed_override('true', 2)
+
+    def test_unknown_version_override_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'default.json'
+            path.write_text('{"format_version": 1}')
+            with self.assertRaises(ValueError):
+                resolve_config(path, overrides=['format_version=99'])
 
 
 if __name__ == "__main__":

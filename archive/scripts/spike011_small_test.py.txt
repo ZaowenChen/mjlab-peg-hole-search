@@ -1,0 +1,184 @@
+"""Independent paired evaluation of a small 1 mm/s PPO training run."""
+
+import argparse
+import copy
+import csv
+import hashlib
+import json
+import time
+from collections import Counter
+from dataclasses import replace
+from pathlib import Path
+
+import numpy as np
+import torch
+from rsl_rl.runners import OnPolicyRunner
+
+from mjlab_contact_prep.config import ContactConfig
+from mjlab_contact_prep.night_run.environment import BankEnv, prepare_bank, save_json
+from mjlab_contact_prep.night_run.jobs import ppo_config, verify_frozen
+from evaluate_xy_speed import prep_audit
+from evaluate_xy_handoff import COLS, HandoffProbe, summarize_case
+
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "evaluation/spike011_small_1mms_v1"
+TEST = OUT / "test"
+DT = .002
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def prepare():
+    plan = json.loads((OUT / "plan.json").read_text())
+    verify_frozen(plan)
+    TEST.mkdir(parents=True, exist_ok=False)
+    bank = prepare_bank(plan["test_cases"], TEST / "bank", batch=len(plan["test_cases"]))
+    rows = prep_audit(TEST)
+    assert len(rows) == 48
+    save_json(TEST / "manifest.json", {
+        "design": "MPHS SPIKE-011 v1.1", "test_cases": plan["test_cases"],
+        "bank_sha256": sha(bank), "training_bank_sha256": plan["training_bank_sha256"],
+        "evaluator_sha256": sha(__file__),
+        "source_evaluator_sha256": sha(ROOT / "scripts/evaluate_xy_handoff.py"),
+        "old_checkpoint_sha256": sha(ROOT / "evaluation/night_fullcircle_5mm_v1/amp_0/seed_7/policy.pt"),
+        "new_checkpoint_sha256": sha(OUT / "amp_0/seed_7/policy.pt"),
+        "class_counts": dict(Counter(r["prep_class"] for r in rows)),
+        "groups": {"A": ["old", .2], "B": ["old", 1.], "C": ["new", 1.]},
+    })
+    print("TEST_PREPARED", dict(Counter(r["prep_class"] for r in rows)), flush=True)
+
+
+def evaluate(group):
+    plan = json.loads((OUT / "plan.json").read_text())
+    verify_frozen(plan)
+    manifest = json.loads((TEST / "manifest.json").read_text())
+    assert manifest["bank_sha256"] == sha(TEST / "bank/bank.pt")
+    assert manifest["evaluator_sha256"] == sha(__file__)
+    rows = json.loads((TEST / "preparation_audit.json").read_text())
+    assert len(rows) == 48
+    cap = .2 if group == "A" else 1.
+    checkpoint = (ROOT / "evaluation/night_fullcircle_5mm_v1/amp_0/seed_7/policy.pt") if group in ("A", "B") else (OUT / "amp_0/seed_7/policy.pt")
+    assert sha(checkpoint) == manifest[("old" if group in ("A", "B") else "new") + "_checkpoint_sha256"]
+    destination = TEST / group
+    destination.mkdir(parents=True, exist_ok=False)
+    env = BankEnv(TEST / "bank/bank.pt", len(rows), 0., 7, autoreset=False, audit=False, horizon=203)
+    config = replace(ContactConfig(), xy_speed=cap * .001)
+    env.term.cfg.contact = config
+    env.term.controller.cfg = config
+    ids = torch.arange(len(rows), device=env.device)
+    env.restore(ids, ids)
+    for family, obj in (("physics", env.env.sim.data), ("controller", env.term.controller),
+                        ("term", env.term), ("probe", env.term.probe)):
+        for name, value in env.pool[family].items():
+            assert torch.equal(getattr(obj, name), value), (family, name)
+    radius = env.metrics()[0].detach().cpu().numpy()
+    probe = HandoffProbe(env, "A", radius, slow_cap_mm_s=cap)
+    invalid = torch.tensor([r["prep_class"] == "failed" for r in rows], dtype=torch.bool, device=env.device)
+    prepared_capture = torch.tensor([r["prep_class"] == "captured" for r in rows], dtype=torch.bool, device=env.device)
+    probe.finished[invalid] = True
+    runner = OnPolicyRunner(env, copy.deepcopy(ppo_config(7, 1)), None, device=env.device)
+    runner.load(str(checkpoint), map_location=env.device)
+    policy = runner.get_inference_policy()
+    start = time.monotonic()
+    try:
+        with torch.inference_mode():
+            for decision in range(203):
+                probe.decision_start()
+                action = policy(env.get_observations()).clamp(-1, 1)
+                action[probe.finished | prepared_capture] = 0
+                env.step(action)
+                newly = (env.term.controller.reason != 0) & ~probe.finished
+                probe.finished |= newly
+                probe.finish_tick[newly] = env.ticks[newly] - 1
+                if bool(probe.finished.all()):
+                    break
+        trace = np.stack(probe.trace)
+        if not np.isfinite(trace).all():
+            raise FloatingPointError("non-finite evaluation trajectory")
+        timestamps = np.arange(len(trace), dtype=np.float32) * DT
+        assert np.allclose(trace[:, 0, 0], timestamps, atol=5e-6)
+        req = np.linalg.norm(trace[:, :, [COLS.index("requested_vx_m_s"), COLS.index("requested_vy_m_s")]], axis=-1)
+        assert float(req.max()) <= cap * .001 + 1e-6, (group, float(req.max()))
+        cases = [summarize_case(trace[:, i], row, probe, i, "A") for i, row in enumerate(rows)]
+        for case, row in zip(cases, rows):
+            case["group"] = group
+            case["ppo_success"] = bool(case["hold_passed"] and row["prep_class"] == "ready")
+            case["pipeline_success"] = bool(case["hold_passed"] and row["prep_class"] != "failed")
+            if case["first_capture_s"] is not None and case["first_capture_s"] > 40.:
+                case["ppo_success"] = case["pipeline_success"] = False
+                case["failure"] = "near_timeout"
+                case["capped_capture_s"] = 40.
+            if row["prep_class"] == "failed":
+                case["failure"] = "preparation_failed"
+                case["capped_capture_s"] = 40.
+        np.savez_compressed(destination / "trajectory.npz", trace=trace, columns=COLS)
+        save_json(destination / "results.json", {"group": group, "requested_cap_mm_s": cap,
+                                                  "checkpoint": str(checkpoint), "wall_s": time.monotonic() - start,
+                                                  "cases": cases})
+        print("TEST", group, "pipeline", sum(x["pipeline_success"] for x in cases),
+              "ppo", sum(x["ppo_success"] for x in cases), "wall_s", round(time.monotonic()-start, 1), flush=True)
+    finally:
+        env.close()
+
+
+def report():
+    groups = {g: json.loads((TEST / g / "results.json").read_text())["cases"] for g in "ABC"}
+    assert all(len(v) == 48 for v in groups.values())
+    ids = [x["id"] for x in groups["A"]]
+    assert all([x["id"] for x in groups[g]] == ids for g in "BC")
+    all_rows = [x for g in "ABC" for x in groups[g]]
+    keys = ["group", "id", "radius_mm", "angle_deg", "prep_class", "actual_handoff_radius_mm",
+            "initial_radius_mm", "first_near_s", "first_capture_s", "hold_passed", "ppo_success",
+            "pipeline_success", "failure", "first_fault_reason", "capped_capture_s", "actual_xy_mean_mm_s",
+            "requested_xy_max_mm_s", "peak_axial_N", "peak_radial_N"]
+    with (TEST / "cases.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows({k: x.get(k) for k in keys} for x in all_rows)
+    summary = {}
+    lines = ["# SPIKE-011 小规模 1 mm/s PPO训练与对照", "",
+             "本轮为48个新孔位 × 3组 = 144次评估；仅一个训练种子。", "",
+             "| 组 | 整体保持通过 | PPO保持通过/需PPO | 失败计40s平均捕获耗时 | 准备失败 | 主要失败 |",
+             "|---|---:|---:|---:|---:|---|"]
+    for g, rows in groups.items():
+        summary[g] = {"total": len(rows), "pipeline_success": sum(x["pipeline_success"] for x in rows),
+                      "ppo_success": sum(x["ppo_success"] for x in rows),
+                      "eligible": sum(x["prep_class"] == "ready" for x in rows),
+                      "prepared_captures": sum(x["prep_class"] == "captured" for x in rows),
+                      "preparation_failures": sum(x["prep_class"] == "failed" for x in rows),
+                      "mean_capped_capture_s": float(np.mean([x["capped_capture_s"] for x in rows])),
+                      "failures": dict(Counter(x["failure"] for x in rows if not x["pipeline_success"])),
+                      "by_radius": {str(r): {"success": sum(x["pipeline_success"] for x in rows if x["radius_mm"] == r),
+                                              "total": sum(x["radius_mm"] == r for x in rows)}
+                                    for r in (.5, 1., 2., 5.)}}
+        s = summary[g]
+        lines.append(f'| {g} | {s["pipeline_success"]}/48 | {s["ppo_success"]}/{s["eligible"]} | {s["mean_capped_capture_s"]:.2f}s | {s["preparation_failures"]} | {s["failures"]} |')
+    for r in (.5, 1., 2., 5.):
+        lines += ["", f"## 名义偏差 {r:g} mm", "", "| A低速 | B旧策略高速 | C新策略高速 |", "|---:|---:|---:|",
+                  "| " + " | ".join(f'{summary[g]["by_radius"][str(r)]["success"]}/{summary[g]["by_radius"][str(r)]["total"]}' for g in "ABC") + " |"]
+    for a, b in (("B", "C"), ("A", "C")):
+        gained = [x["id"] for x, y in zip(groups[b], groups[a]) if x["pipeline_success"] and not y["pipeline_success"]]
+        lost = [x["id"] for x, y in zip(groups[b], groups[a]) if not x["pipeline_success"] and y["pipeline_success"]]
+        summary[f"{a}_to_{b}"] = {"gained": gained, "lost": lost}
+        lines += ["", f"{a}→{b}：失败转成功 {len(gained)}，成功转失败 {len(lost)}。"]
+    lines += ["", "首次捕获使用101个连续2 ms采样；其后追加0.5 s保持。1 mm/s为请求上限，实际速度另见逐案数据。",
+              "一个种子和小样本预算只能判断早期趋势；对未学会的结果不做1 mm/s不可学习的结论。",
+              "", "逐案数据：`cases.csv`。2 ms轨迹：`A|B|C/trajectory.npz`。运行源代码与权重哈希：`manifest.json`。"]
+    save_json(TEST / "summary.json", summary)
+    (TEST / "REPORT.md").write_text("\n".join(lines) + "\n")
+    print("REPORT_READY", TEST / "REPORT.md", flush=True)
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("stage", choices=("prepare", "A", "B", "C", "report"))
+    args = p.parse_args()
+    {"prepare": prepare, "A": lambda: evaluate("A"), "B": lambda: evaluate("B"),
+     "C": lambda: evaluate("C"), "report": report}[args.stage]()
+
+
+if __name__ == "__main__":
+    main()

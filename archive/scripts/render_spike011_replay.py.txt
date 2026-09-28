@@ -1,0 +1,118 @@
+"""Render a top-view video from SPIKE-011's recorded 2 ms trajectories."""
+
+import json
+from pathlib import Path
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.animation import FFMpegWriter
+from matplotlib.patches import Circle
+import numpy as np
+import torch
+
+
+ROOT = Path(__file__).resolve().parents[1]
+TEST = ROOT / "evaluation/spike011_small_1mms_v1/test"
+CASE_ID = "grid_00030"
+OUTPUT = TEST / "videos/grid_00030_5mm_three_policy_comparison.mp4"
+
+
+def main():
+    bank = torch.load(TEST / "bank/bank.pt", weights_only=False, map_location="cpu")
+    ids = [row["id"] for row in bank["rows"]]
+    index = ids.index(CASE_ID)
+    center = bank["physics"]["mocap_pos"][index, 1, :2].numpy()
+    groups = {}
+    for key in "ABC":
+        z = np.load(TEST / key / "trajectory.npz")
+        columns = list(z["columns"])
+        t = z["trace"][:, index, :]
+        row = next(x for x in json.loads((TEST / key / "results.json").read_text())["cases"] if x["id"] == CASE_ID)
+        end = row["hold_end_s"]
+        if end is None:
+            end = 40. if row["failure"] in ("never_near", "near_timeout") else float(np.flatnonzero(t[:, columns.index("reason")] != 0)[0]) * .002
+        groups[key] = {
+            "time": t[:, columns.index("time_s")],
+            "xy": (t[:, [columns.index("tip_x_m"), columns.index("tip_y_m")]] - center) * 1000,
+            "radial": t[:, columns.index("radial_m")] * 1000,
+            "force": t[:, columns.index("Fz_N")],
+            "end": end,
+            "row": row,
+        }
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+
+    plt.rcParams.update({"font.size": 10})
+    fig = plt.figure(figsize=(12.6, 7.2), facecolor="#f8fafc")
+    grid = fig.add_gridspec(2, 3, height_ratios=[3.5, 1.1], hspace=.35, wspace=.25,
+                            left=.06, right=.98, top=.84, bottom=.10)
+    fig.suptitle("SPIKE-011 | 5 mm offset | recorded trajectory replay", fontsize=17, y=.965)
+    foot = fig.text(.5, .028, "Top view from saved tip coordinates; 4x playback. Target circle is the 0.15 mm capture criterion, not hole geometry.",
+                    ha="center", color="#475569", fontsize=9)
+    timestamp = fig.text(.5, .895, "", ha="center", fontsize=13, color="#0f172a")
+    artists = {}
+    labels = {"A": "A | old PPO, 0.2 mm/s", "B": "B | old PPO, 1.0 mm/s", "C": "C | new PPO, 1.0 mm/s"}
+    colors = {"A": "#2563eb", "B": "#dc2626", "C": "#059669"}
+    for col, key in enumerate("ABC"):
+        ax = fig.add_subplot(grid[0, col])
+        ax.set_title(labels[key], fontsize=12, fontweight="bold", color=colors[key])
+        ax.set_xlim(-2, 2)
+        ax.set_ylim(-1, 5.5)
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xlabel("X from hole center (mm)")
+        if col == 0:
+            ax.set_ylabel("Y from hole center (mm)")
+        ax.grid(True, alpha=.22)
+        ax.add_patch(Circle((0, 0), .15, facecolor="#bbf7d0", edgecolor="#16a34a", lw=1.5))
+        ax.plot(*groups[key]["xy"][0], "o", ms=5, color="#64748b")
+        trail, = ax.plot([], [], color=colors[key], lw=2.2)
+        marker, = ax.plot([], [], "o", color=colors[key], ms=7)
+        status = ax.text(.04, .97, "", transform=ax.transAxes, va="top", fontsize=10,
+                         bbox={"facecolor": "white", "alpha": .85, "edgecolor": "none"})
+        fx = fig.add_subplot(grid[1, col])
+        fx.set_xlim(0, 28)
+        fx.set_ylim(-5, 50)
+        fx.grid(True, alpha=.22)
+        fx.axhline(20, color="#64748b", ls="--", lw=1)
+        fx.axhline(40, color="#dc2626", ls=":", lw=1)
+        fx.set_xlabel("Search time (s)")
+        if col == 0:
+            fx.set_ylabel("Axial force (N)")
+        force_line, = fx.plot([], [], color=colors[key], lw=1.5)
+        artists[key] = (trail, marker, status, force_line)
+
+    writer = FFMpegWriter(fps=20, codec="libx264", bitrate=1800,
+                          extra_args=["-pix_fmt", "yuv420p", "-movflags", "+faststart"])
+    with writer.saving(fig, str(OUTPUT), dpi=110):
+        for frame in range(136):
+            now = frame * .2
+            timestamp.set_text(f"Simulation time: {now:4.1f} s")
+            for key in "ABC":
+                g = groups[key]
+                j = min(round(min(now, g["end"]) / .002), len(g["time"]) - 1)
+                xy = g["xy"][:j+1]
+                trail, marker, status, force_line = artists[key]
+                trail.set_data(xy[:, 0], xy[:, 1])
+                marker.set_data([xy[-1, 0]], [xy[-1, 1]])
+                force_line.set_data(g["time"][:j+1], g["force"][:j+1])
+                r = g["row"]
+                if now >= g["end"]:
+                    result = f"SUCCESS at {r['first_capture_s']:.2f}s" if r["hold_passed"] else f"FAILED: {r['failure']} at {g['end']:.2f}s"
+                else:
+                    result = "Searching"
+                status.set_text(f"{result}\nRadial error: {g['radial'][j]:.2f} mm\nFz: {g['force'][j]:.1f} N")
+            writer.grab_frame()
+    plt.close(fig)
+    (OUTPUT.with_suffix(".json")).write_text(json.dumps({
+        "source": "SPIKE-011 recorded 2 ms tip trajectories and axial force",
+        "case_id": CASE_ID, "nominal_offset_mm": 5,
+        "groups": {k: {"checkpoint_group": k, "result": g["row"]["failure"] or "success",
+                        "first_capture_s": g["row"]["first_capture_s"], "end_s": g["end"]}
+                   for k, g in groups.items()},
+        "camera_render": False, "playback_speed": "4x",
+    }, ensure_ascii=False, indent=2) + "\n")
+    print(OUTPUT)
+
+
+if __name__ == "__main__":
+    main()

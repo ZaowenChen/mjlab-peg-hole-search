@@ -1,0 +1,163 @@
+"""Render synchronized 48-position matrix videos from SPIKE-011 test traces."""
+
+import argparse
+import json
+import subprocess
+from pathlib import Path
+
+import numpy as np
+import torch
+from PIL import Image, ImageDraw, ImageFont
+
+
+ROOT = Path(__file__).resolve().parents[1]
+TEST = ROOT / "evaluation/spike011_small_1mms_v1/test"
+VIDEOS = TEST / "videos"
+FONT = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+WIDTH, HEIGHT = 1920, 1240
+TILE_W, TILE_H = 235, 185
+LEFT, TOP = 20, 80
+PLOT_LEFT, PLOT_TOP, PLOT_SIZE = 8, 39, 136
+FRAMES, FPS = 201, 20  # 0.2 simulated seconds per frame, 4x playback.
+
+
+def font(size):
+    return ImageFont.truetype(FONT, size)
+
+
+def text_status(row, elapsed):
+    if elapsed < row["end"]:
+        return "移动中", "#334155"
+    if row["case"]["hold_passed"]:
+        if row["case"]["prep_class"] == "captured":
+            return "准备已入孔", "#047857"
+        return f"成功 {row['case']['first_capture_s']:.1f}s", "#047857"
+    reason = row["case"]["failure"]
+    label = {"contact_recovery_failed": "接触恢复失败", "overload": "超载", "never_near": "未到近孔",
+             "near_timeout": "超时", "post_capture_hold_failed": "保持失败"}.get(reason, reason or "失败")
+    return label, "#b91c1c"
+
+
+def draw_background(group, cases, scales):
+    bg = Image.new("RGB", (WIDTH, HEIGHT), "#f8fafc")
+    d = ImageDraw.Draw(bg)
+    title = "1 mm/s 新训练 PPO" if group == "C" else "0.2 mm/s 旧 PPO 基准"
+    accent = "#047857" if group == "C" else "#1d4ed8"
+    d.text((LEFT, 16), f"SPIKE-011  |  {title}  |  48 个相同孔位", font=font(27), fill=accent)
+    d.text((LEFT, 52), "每格：孔中心绿色圆 = 0.15 mm 捕获判据；灰点 = 寻孔起点；曲线 = 实际轴尖路径", font=font(17), fill="#334155")
+    for i, case in enumerate(cases):
+        col, row = i % 8, i // 8
+        x, y = LEFT + col * TILE_W, TOP + row * TILE_H
+        d.rounded_rectangle((x, y, x + TILE_W - 5, y + TILE_H - 5), radius=8,
+                            fill="#ffffff", outline="#cbd5e1", width=1)
+        label = (f"{case['radius_mm']:g} mm  {case['angle_deg']:03.0f}°" if row < 4
+                 else f"随机 {i-31:02d}  {case['radius_mm']:.2f} mm  {case['angle_deg']:.0f}°")
+        d.text((x + 8, y + 6), label, font=font(15), fill="#0f172a")
+        px, py = x + PLOT_LEFT, y + PLOT_TOP
+        d.rectangle((px, py, px + PLOT_SIZE, py + PLOT_SIZE), fill="#f8fafc", outline="#dbe3eb")
+        center = px + PLOT_SIZE // 2, py + PLOT_SIZE // 2
+        d.line((center[0], py, center[0], py + PLOT_SIZE), fill="#e2e8f0")
+        d.line((px, center[1], px + PLOT_SIZE, center[1]), fill="#e2e8f0")
+        radius_px = max(4, round(.15 / scales[i] * PLOT_SIZE / 2))
+        d.ellipse((center[0]-radius_px, center[1]-radius_px,
+                   center[0]+radius_px, center[1]+radius_px), fill="#bbf7d0", outline="#16a34a", width=2)
+        d.text((px + 4, py + PLOT_SIZE - 21), f"±{scales[i]:.1f}mm", font=font(12), fill="#64748b")
+    d.text((LEFT, HEIGHT - 44), "两段视频使用相同格位、坐标比例和时间轴；来源为保存的 2 ms 轨迹，4 倍速数据回放，并非三维相机录像。",
+           font=font(17), fill="#475569")
+    return bg
+
+
+def render(group, bank, cases):
+    rows = json.loads((TEST / group / "results.json").read_text())["cases"]
+    assert [r["id"] for r in rows] == [r["id"] for r in cases]
+    z = np.load(TEST / group / "trajectory.npz")
+    trace = z["trace"]
+    columns = list(z["columns"])
+    center = bank["physics"]["mocap_pos"][:, 1, :2].numpy()
+    scale = [max(1.2, float(r["radius_mm"]) * 1.35) for r in cases]
+    base = draw_background(group, cases, scale)
+    paths = []
+    for i, case in enumerate(rows):
+        end = case["hold_end_s"] if case["hold_end_s"] is not None else 40.
+        xy = (trace[:, i, :][:, [columns.index("tip_x_m"), columns.index("tip_y_m")]] - center[i]) * 1000
+        pixel = np.round(np.stack((PLOT_SIZE/2 + xy[:, 0] / scale[i] * PLOT_SIZE/2,
+                                   PLOT_SIZE/2 - xy[:, 1] / scale[i] * PLOT_SIZE/2), axis=-1)).astype(int)
+        paths.append({"case": case, "xy": xy, "pixel": pixel, "end": float(end),
+                      "force": trace[:, i, columns.index("Fz_N")],
+                      "radius": trace[:, i, columns.index("radial_m")] * 1000})
+    output = VIDEOS / ("matrix_C_new_1mms.mp4" if group == "C" else "matrix_A_old_0p2mms.mp4")
+    accent = "#059669" if group == "C" else "#2563eb"
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-vcodec", "rawvideo", "-s", f"{WIDTH}x{HEIGHT}",
+           "-pix_fmt", "rgb24", "-r", str(FPS), "-i", "-", "-an", "-c:v", "libx264", "-preset", "veryfast",
+           "-crf", "22", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(output)]
+    process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        for frame_number in range(FRAMES):
+            elapsed = frame_number * .2
+            image = base.copy()
+            d = ImageDraw.Draw(image)
+            d.rounded_rectangle((WIDTH - 258, 15, WIDTH - 25, 64), radius=10, fill="#e2e8f0")
+            d.text((WIDTH - 241, 23), f"仿真时间 {elapsed:4.1f} s", font=font(21), fill="#0f172a")
+            for i, row in enumerate(paths):
+                col, matrix_row = i % 8, i // 8
+                x, y = LEFT + col*TILE_W, TOP + matrix_row*TILE_H
+                n = min(round(min(elapsed, row["end"]) / .002), len(row["pixel"]) - 1)
+                plot = Image.new("RGB", (PLOT_SIZE, PLOT_SIZE), "#f8fafc")
+                pd = ImageDraw.Draw(plot)
+                center_xy = PLOT_SIZE // 2
+                pd.line((center_xy, 0, center_xy, PLOT_SIZE), fill="#e2e8f0")
+                pd.line((0, center_xy, PLOT_SIZE, center_xy), fill="#e2e8f0")
+                radius_px = max(4, round(.15 / scale[i] * PLOT_SIZE/2))
+                pd.ellipse((center_xy-radius_px, center_xy-radius_px, center_xy+radius_px, center_xy+radius_px),
+                           fill="#bbf7d0", outline="#16a34a", width=2)
+                start = tuple(int(v) for v in row["pixel"][0])
+                pd.ellipse((start[0]-3, start[1]-3, start[0]+3, start[1]+3), fill="#94a3b8")
+                points = [tuple(int(v) for v in point) for point in row["pixel"][:n+1:50]]
+                if n and (not points or points[-1] != tuple(row["pixel"][n])):
+                    points.append(tuple(int(v) for v in row["pixel"][n]))
+                if len(points) >= 2:
+                    pd.line(points, fill=accent, width=3, joint="curve")
+                tip = tuple(int(v) for v in row["pixel"][n])
+                pd.ellipse((tip[0]-4, tip[1]-4, tip[0]+4, tip[1]+4), fill=accent)
+                image.paste(plot, (x + PLOT_LEFT, y + PLOT_TOP))
+                d.rectangle((x+PLOT_LEFT, y+PLOT_TOP, x+PLOT_LEFT+PLOT_SIZE, y+PLOT_TOP+PLOT_SIZE), outline="#cbd5e1")
+                tx = x + 151
+                status, color = text_status(row, elapsed)
+                d.text((tx, y + 49), status, font=font(14), fill=color)
+                d.text((tx, y + 78), f"r {row['radius'][n]:.2f}mm", font=font(13), fill="#334155")
+                d.text((tx, y + 101), f"Fz {row['force'][n]:.1f}N", font=font(13), fill="#334155")
+                d.text((tx, y + 125), f"点位 {i+1:02d}", font=font(12), fill="#64748b")
+                if elapsed >= row["end"]:
+                    d.rounded_rectangle((x+1, y+1, x+TILE_W-6, y+TILE_H-6), radius=8,
+                                        outline="#10b981" if row["case"]["hold_passed"] else "#ef4444", width=3)
+            assert process.stdin is not None
+            process.stdin.write(image.tobytes())
+            if frame_number % 40 == 0:
+                print(group, frame_number, "/", FRAMES-1, flush=True)
+    finally:
+        if process.stdin:
+            process.stdin.close()
+    error = process.stderr.read().decode(errors="replace") if process.stderr else ""
+    if process.wait() != 0:
+        raise RuntimeError(error)
+    manifest = {"source": "SPIKE-011 saved 2 ms test trajectory", "group": group,
+                "cases": [r["id"] for r in cases], "same_cell_order": True,
+                "simulation_time_s": 40., "frames": FRAMES, "fps": FPS, "playback_speed": "4x",
+                "camera_render": False, "output": str(output)}
+    output.with_suffix(".json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    print(output, flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("group", choices=("A", "C", "both"))
+    args = parser.parse_args()
+    VIDEOS.mkdir(parents=True, exist_ok=True)
+    bank = torch.load(TEST / "bank/bank.pt", weights_only=False, map_location="cpu")
+    cases = json.loads((TEST / "A/results.json").read_text())["cases"]
+    for group in ("A", "C") if args.group == "both" else (args.group,):
+        render(group, bank, cases)
+
+
+if __name__ == "__main__":
+    main()

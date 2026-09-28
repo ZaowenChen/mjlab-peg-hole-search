@@ -7,4 +7,4 @@
 | 早期原始工作区（未分发） | 早期原始版本 | 原始参考 |
 | 学习资料工作区（未分发） | 学习资料、源码包与来源校验 | 资料参考 |
 
-来源机器可读记录见 `reference/workspace_origin.json`。未执行目录删除、合并或物理搬移。
+来源机器可读记录见 `reference/workspace_origin.json`。外部旧工作区未执行删除、合并或物理搬移。当前仓库在 2026-09-28 将历史脚本/配置归入 `archive/`、历史报告归入 `docs/history/`；映射见 [归档清单](../archive/manifest.json)。
